@@ -1,7 +1,7 @@
 """
 Micropython module for Automated Can Crusher using the following hardware:
-Raspberry Pi Pico
-PICO Breakout Board w/ screw terminals
+Raspberry Pi 3 B+
+Breakout Board w/ screw terminals
 Wolfwhoop PW-D Control Buck Converter
     6-24V to 5V 1.5A Step-Down Regulator Module Power Inverter Volt Stabilizer
     (One needed to power Pico all by itself, due to voltage drop, other to power sensors, relays, and driver)
@@ -26,44 +26,47 @@ break-beam sensors to detect both positioning and payload.
 
 """
 import sys
-sys.path.append('/crusher')
-sys.path.append('/lcd')
-# import Stepper
-import time
-from machine import I2C, Pin
-from lcd_api import LcdApi
-from i2c_lcd import I2cLcd
+import drivers
+from time import sleep
+from time import time as ti
 
+#from machine import I2C, Pin
+#from lcd_api import LcdApi
+#from i2c_lcd import I2cLcd
+lcd = drivers.Lcd()
 
-time.sleep(1.5)
+sleep(1.5)
 home_pin = 14
-start_pin = 2
-reset_pin = 28
-load_pin = 6
-retract_pin = 7
-l1 = 25
-l2 = 0
-disp_sda = 4
-disp_scl = 5
-crushPin = 20
-compPin = 22
-case_safety = 16
-ts = time.time()
+# old start_pin = 2
+start_pin = 4
+# reset_pin = 28
+# load_pin = 6
+# retract_pin = 7
+# l1 = 25
+# l2 = 0
+# old_disp_sda = 4
+disp_sda = 2
+# old_disp_scl = 5
+disp_scl = 3
+# crushPin = 20
+# compPin = 22
+# case_safety = 16
+ts = ti()
 nts = ''
 
 # Non-Class devices
-led1 = Pin(l1, Pin.OUT)
-led2 = Pin(l2, Pin.OUT)
-home_switch = Pin(home_pin, Pin.IN, Pin.PULL_UP)
-safe_switch = Pin(case_safety, Pin.IN, Pin.PULL_UP)
-start_button = Pin(start_pin, Pin.IN, Pin.PULL_UP)
-reset_button = Pin(reset_pin, Pin.IN, Pin.PULL_UP)
-load = Pin(load_pin, Pin.OUT)
-retract = Pin(retract_pin, Pin.OUT)
-crusher = Pin(crushPin, Pin.OUT)
-crusher.value(1)
-compressor = Pin(compPin, Pin.OUT)
-compressor.value(1)
+# led1 = Pin(l1, Pin.OUT)
+# led2 = Pin(l2, Pin.OUT)
+# home_switch = Pin(home_pin, Pin.IN, Pin.PULL_UP)
+# safe_switch = Pin(case_safety, Pin.IN, Pin.PULL_UP)
+# start_button = Pin(start_pin, Pin.IN, Pin.PULL_UP)
+# reset_button = Pin(reset_pin, Pin.IN, Pin.PULL_UP)
+# load = Pin(load_pin, Pin.OUT)
+# retract = Pin(retract_pin, Pin.OUT)
+# crusher = Pin(crushPin, Pin.OUT)
+# crusher.value(1)
+# compressor = Pin(compPin, Pin.OUT)
+# compressor.value(1)
 
 ### LCD Display Creation
 # Find and define Display
@@ -94,7 +97,7 @@ def is_safe():
 def home():
     is_safe()
     global ts
-    looptime = time.time()
+    looptime = ti()
     try:
         led1.value(1)
         if load_can():
@@ -122,7 +125,7 @@ def home():
 
 def load_can():
     if is_safe():
-        time.sleep(1)
+        sleep(1)
         lcd.clear()
         lcd.putstr('Safe passed')
 
@@ -131,7 +134,7 @@ def load_can():
     lcd.clear()
     while not home_switch.value() == 0:
         load.value(1)
-        time.sleep(0.1)
+        sleep(0.1)
         load.value(0)
         if can_there and safe_switch.value() == 0:
             can_loaded = True
@@ -146,7 +149,7 @@ def load_can():
         else:
             print('Keep Moving')
     unhome()
-    time.sleep(0.25)
+    sleep(0.25)
     if can_there and safe_switch.value() == 0:
         can_loaded = True
         print('Can Loaded')
@@ -164,24 +167,24 @@ def unhome():
 
 def f_inch(val=0.25):
     load.value(1)
-    time.sleep(val)
+    sleep(val)
     load.value(0)
 
 def b_inch(val=0.25):
     retract.value(1)
-    time.sleep(val)
+    sleep(val)
     retract.value(0)
 
 def crush_it():
     lcd.clear()
     lcd.putstr("Crushing!!")
-    time.sleep(0.5)
+    sleep(0.5)
     crusher.value(0)
-    time.sleep(1)
+    sleep(1)
     lcd.clear()
     lcd.putstr("Retracting!!")
     crusher.value(1)
-    time.sleep(2)
+    sleep(2)
 
 def blink():
     print("blink")
@@ -189,10 +192,10 @@ def blink():
     while blinkVal > 0:
         led1.value(0)
         led2.value(0)
-        time.sleep(0.07)
+        sleep(0.07)
         led1.value(1)
         led2.value(1)
-        time.sleep(0.07)
+        sleep(0.07)
         blinkVal -= 1
     else:
         led1.value(0)
@@ -204,10 +207,10 @@ def blink_error():
     while blinkVal > 0:
         led1.value(0)
         led2.value(0)
-        time.sleep(0.5)
+        sleep(0.5)
         led1.value(1)
         led2.value(1)
-        time.sleep(0.5)
+        sleep(0.5)
         blinkVal -= 1
     else:
         led1.value(0)
@@ -221,10 +224,10 @@ def countdown(n):
         lcd.putstr( 'Pressurizing....Countdown = ')
         lcd.putstr(thisSecond)
         n = n -1
-        time.sleep(0.8)
+        sleep(0.8)
 
 def need_pressure():
-    nts = time.time()
+    nts = ti()
     time_diff = nts - ts
     if time_diff >= 144000:
         print("Time greater than 40 hours")
@@ -243,7 +246,7 @@ def runCycler():
     # Add pressure check function here later
     compressor.value(0)
     countdown(need_pressure())
-    time.sleep(0.5)
+    sleep(0.5)
     crush_it()
     led1.value(1)
     led2.value(1)
@@ -251,21 +254,21 @@ def runCycler():
     while load_can():
         if count > 0:
             crush_it()
-            time.sleep(2)
+            sleep(2)
             count -= 1
         else:
             lcd.clear()
             lcd.putstr("Max 5 exceeded!!Reset in 10 sec")
-            time.sleep(10)
+            sleep(10)
             compressor.value(1)
     else:
             lcd.clear()
             lcd.putstr("No more cans!!  Reset in 10 sec")
-            time.sleep(10)
+            sleep(10)
             compressor.value(1)
 
     home()
-    ts = time.time()
+    ts = ti()
     print("Timestamp reset to", str(ts))
     led1.value(0)
     led2.value(0)
@@ -282,7 +285,7 @@ blink_error()
 compressor.value(0)
 countdown(40)
 compressor.value(1)
-ts = time.time()
+ts = ti()
 print("Timestamp reset to", str(ts))
 
 # Ensure crusher is retracted at start
@@ -294,7 +297,7 @@ lcd.__dict__
 # Home the rotor
 lcd.clear()
 lcd.putstr("Homing loader   for first time")
-time.sleep(2)
+sleep(2)
 lcd.clear()
 home()
 # Wait for Start Button
@@ -302,7 +305,7 @@ try:
     while True:
         first = start_button.value()
         r_first = reset_button.value()
-        time.sleep(0.01)
+        sleep(0.01)
         second = start_button.value()
         r_second = reset_button.value()
         if first and not second:
@@ -324,7 +327,7 @@ try:
                 want_pressure = 10
             countdown(want_pressure)
             compressor.value(1)
-            ts = time.time()
+            ts = ti()
             print("Timestamp reset to", str(ts))
 
 except KeyboardInterrupt:
