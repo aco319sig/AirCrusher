@@ -155,6 +155,7 @@ def load_can():
     lcd.lcd_clear()
     while not home_switch.is_pressed:
         loader.forward()
+        sleep(0.25)
         if can_there and not safe_switch.is_pressed:
             can_loaded = True
             print('Can Loaded')
@@ -180,6 +181,7 @@ def load_can():
         return False
 
 def unhome():
+    print("unhoming")
     loader.forward()
     home_switch.wait_for_release()
     loader.stop()
@@ -195,6 +197,7 @@ def b_inch(val=0.25):
     loader.stop()
 
 def crush_it():
+    print("Crushing")
     lcd.lcd_clear()
     lcd.lcd_display_string("Crushing!!", 1)
     compressor.off()
@@ -202,6 +205,7 @@ def crush_it():
     crusher.on()
     sleep(1)
     # lcd.lcd_clear()
+    print("Retracting")
     lcd.lcd_display_string("Retracting!!", 2)
     crusher.off()
     sleep(0.5)
