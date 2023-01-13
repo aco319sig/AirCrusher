@@ -29,7 +29,7 @@ import sys
 import drivers
 from time import sleep
 from time import time as ti
-
+from gpiozero import Button, LED, Motor
 
 sleep(1.5)
 home_pin = 14
@@ -48,25 +48,24 @@ ts = ti()
 nts = ''
 
 # Non-Class devices
-led1 = Pin(l1, Pin.OUT)
-led2 = Pin(l2, Pin.OUT)
-home_switch = Pin(home_pin, Pin.IN, Pin.PULL_UP)
-safe_switch = Pin(case_safety, Pin.IN, Pin.PULL_UP)
-start_button = Pin(start_pin, Pin.IN, Pin.PULL_UP)
-reset_button = Pin(reset_pin, Pin.IN, Pin.PULL_UP)
-load = Pin(load_pin, Pin.OUT)
-retract = Pin(retract_pin, Pin.OUT)
-crusher = Pin(crushPin, Pin.OUT)
-crusher.value(1)
-compressor = Pin(compPin, Pin.OUT)
-compressor.value(1)
+led1 = LED(l1)
+led2 = LED(l2)
+home_switch = Button(home_pin, pull_up=True)
+safe_switch = Button(case_safety, pull_up=True)
+start_button = Button(start_pin, pull_up=True)
+reset_button = Button(reset_pin, pull_up=True)
+loader = Motor(load_pin, retract_pin)
+crusher = LED(crushPin)
+crusher.off()
+compressor = LED(compPin)
+compressor.off()
 
 ### Instantiate classes
 # Create display instance
 lcd = drivers.Lcd()
 
 def is_safe():
-    if safe_switch.value():
+    if safe_switch.is_pressed():
         lcd.lcd_clear()
         lcd.lcd_display_string('Rotator Jammed', 1)
         print("Rotator is Jammed!")
@@ -82,18 +81,18 @@ def home():
     global ts
     looptime = ti()
     try:
-        led1.value(1)
+        led1.on()
         if load_can():
             # Add pressure check function here later
-            compressor.value(0)
+            compressor.on()
             countdown(need_pressure())
             crush_it()
         else:
-            if safe_switch.value() == 0:
+            if not safe_switch.is_pressed():
                 print('Safe Passed')
                 lcd.lcd_clear()
                 lcd.lcd_display_string('Loader ready', 1)
-                lcd.lcd_display_string('Grn Btn first!', 2)
+                lcd.lcd_display_string('Green first!', 2)
                 blink()
                 return True
             else:
@@ -104,7 +103,7 @@ def home():
                 return False
     except KeyboardInterrupt:
         print('Program terminated by KBI')
-        led1.value(0)
+        led1.off()
         return False
 
 def load_can():
@@ -116,16 +115,14 @@ def load_can():
     can_there = False
     can_loaded = False
     lcd.lcd_clear()
-    while not home_switch.value() == 0:
-        load.value(1)
-        sleep(0.1)
-        load.value(0)
-        if can_there and safe_switch.value() == 0:
+    while not home_switch.is_pressed():
+        loader.forward()
+        if can_there and not safe_switch.is_pressed():
             can_loaded = True
             print('Can Loaded')
             lcd.lcd_clear()
             lcd.lcd_display_string('Can Loaded', 1)
-        elif safe_switch.value() == 1:
+        elif safe_switch.is_pressed():
             can_there = True
             print('Can Found')
             lcd.lcd_clear()
@@ -134,7 +131,7 @@ def load_can():
             print('Keep Moving')
     unhome()
     sleep(0.25)
-    if can_there and safe_switch.value() == 0:
+    if can_there and not safe_switch.is_pressed():
         can_loaded = True
         print('Can Loaded')
         lcd.lcd_clear()
@@ -146,59 +143,43 @@ def load_can():
         return False
 
 def unhome():
-    while home_switch.value() == 0:
-        f_inch(0.1)
+    loader.forward()
+    home_switch.wait_for_release()
+    loader.stop()
 
 def f_inch(val=0.25):
-    load.value(1)
+    loader.forward()
     sleep(val)
-    load.value(0)
+    loader.stop()
 
 def b_inch(val=0.25):
-    retract.value(1)
+    loader.reverse()
     sleep(val)
-    retract.value(0)
+    loader.stop()
 
 def crush_it():
     lcd.lcd_clear()
     lcd.lcd_display_string("Crushing!!", 1)
+    compressor.off()
     sleep(0.5)
-    crusher.value(0)
+    crusher.on()
     sleep(1)
     # lcd.lcd_clear()
     lcd.lcd_display_string("Retracting!!", 2)
-    crusher.value(1)
+    crusher.off()
+    sleep(0.5)
+    compressor.on()
     sleep(2)
 
 def blink():
     print("blink")
-    blinkVal = 10
-    while blinkVal > 0:
-        led1.value(0)
-        led2.value(0)
-        sleep(0.07)
-        led1.value(1)
-        led2.value(1)
-        sleep(0.07)
-        blinkVal -= 1
-    else:
-        led1.value(0)
-        led2.value(0)
+    led1.blink(on_time=0.07, off_time=0.07, n=10, background=False)
+    led2.blink(on_time=0.07, off_time=0.07, n=10, background=False)
 
 def blink_error():
-    print("Blink_error")
-    blinkVal = 3
-    while blinkVal > 0:
-        led1.value(0)
-        led2.value(0)
-        sleep(0.5)
-        led1.value(1)
-        led2.value(1)
-        sleep(0.5)
-        blinkVal -= 1
-    else:
-        led1.value(0)
-        led2.value(0)
+    print("blink_error")
+    led1.blink(on_time=0.5, off_time=0.5, n=3, background=False)
+    led2.blink(on_time=0.5, off_time=0.5, n=3, background=False)
 
 def countdown(n):
     while n>0:
@@ -230,12 +211,11 @@ def need_pressure():
 def runCycler():
     global ts
     # Add pressure check function here later
-    compressor.value(0)
+    compressor.on()
     countdown(need_pressure())
-    sleep(0.5)
     crush_it()
-    led1.value(1)
-    led2.value(1)
+    led1.on()
+    led2.on()
     count = 5
     while load_can():
         if count > 0:
@@ -269,16 +249,16 @@ print("Safety Check Done")
 # Acknowedge power on
 lcd.lcd_clear()
 lcd.lcd_display_string("Power-On-", 1)
-lcd.lcd_display_string("Self-  Test", 2)
+lcd.lcd_display_string("Self-Test", 2)
 sleep(1)
-compressor.value(0)
+compressor.on()
 countdown(40)
-compressor.value(1)
+compressor.off()
 ts = ti()
 print("Timestamp reset to", str(ts))
 
 # Ensure crusher is retracted at start
-crusher.value(1)
+crusher.off()
 
 # Home the rotor
 lcd.lcd_clear()
@@ -308,12 +288,12 @@ try:
         elif not r_first and r_second:
             lcd.lcd_clear()
             lcd.lcd_display_string('Reset released', 1)
-            compressor.value(0)
+            compressor.on()
             want_pressure = need_pressure()
             if want_pressure < 10:
                 want_pressure = 10
             countdown(want_pressure)
-            compressor.value(1)
+            compressor.off()
             ts = ti()
             print("Timestamp reset to", str(ts))
 
@@ -321,7 +301,9 @@ except KeyboardInterrupt:
     lcd.lcd_clear()
     lcd.lcd_display_string('Program Stop', 1)
     lcd.lcd_display_string('by KBI',2)
-    crusher.value(1)
-    compressor.value(1)
-    led1.value(0)
-    led2.value(0)
+    loader.stop()
+    crusher.off()
+    compressor.off()
+    blink_error()
+    led1.off()
+    led2.off()
