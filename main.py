@@ -29,21 +29,21 @@ import sys
 import drivers
 from time import sleep
 from time import time as ti
-from gpiozero import Button, LED, Motor
+from gpiozero import Button, LED, Motor, DigitalOutputDevice
 
 sleep(1.5)
-home_pin = 14
+home_pin = 23
 start_pin = 20
 reset_pin = 16
-load_pin = 7
-retract_pin = 8
+load_pin = 8
+retract_pin = 7
 l1 = 17
 l2 = 21
 disp_sda = 2
 disp_scl = 3
 crushPin = 19
 compPin = 13
-case_safety = 15
+case_safety = 24
 ts = ti()
 nts = ''
 
@@ -55,17 +55,56 @@ safe_switch = Button(case_safety, pull_up=True)
 start_button = Button(start_pin, pull_up=True)
 reset_button = Button(reset_pin, pull_up=True)
 loader = Motor(load_pin, retract_pin)
-crusher = LED(crushPin)
+crusher = DigitalOutputDevice(crushPin, active_high=False, initial_value=False)
 crusher.off()
-compressor = LED(compPin)
+compressor = DigitalOutputDevice(compPin, active_high=False, initial_value=False)
 compressor.off()
 
 ### Instantiate classes
 # Create display instance
 lcd = drivers.Lcd()
 
+def switch_test():
+    try:
+        while True:
+            if start_button.is_pressed:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Start Pressed', 1)
+            else:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Start released', 1)
+            sleep(2)
+            if reset_button.is_pressed:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Reset Pressed', 1)
+            else:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Reset released', 1)
+            sleep(2)
+            if safe_switch.is_pressed:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Safe Pressed', 1)
+            else:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Safe released', 1)
+            sleep(2)
+            if home_switch.is_pressed:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Home Pressed', 1)
+            else:
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Home released', 1)
+            sleep(2)
+    except KeyboardInterrupt:
+        # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
+        print("Cleaning up!")
+        display.lcd_clear()
+        lcd.lcd_display_string('Exiting debug', 1)
+        sleep(3)
+        display.lcd_clear()
+
 def is_safe():
-    if safe_switch.is_pressed():
+    if safe_switch.is_pressed:
         lcd.lcd_clear()
         lcd.lcd_display_string('Rotator Jammed', 1)
         print("Rotator is Jammed!")
@@ -88,7 +127,7 @@ def home():
             countdown(need_pressure())
             crush_it()
         else:
-            if not safe_switch.is_pressed():
+            if not safe_switch.is_pressed:
                 print('Safe Passed')
                 lcd.lcd_clear()
                 lcd.lcd_display_string('Loader ready', 1)
@@ -111,18 +150,17 @@ def load_can():
         sleep(1)
         lcd.lcd_clear()
         lcd.lcd_display_string('Safe passed', 1)
-
     can_there = False
     can_loaded = False
     lcd.lcd_clear()
-    while not home_switch.is_pressed():
+    while not home_switch.is_pressed:
         loader.forward()
-        if can_there and not safe_switch.is_pressed():
+        if can_there and not safe_switch.is_pressed:
             can_loaded = True
             print('Can Loaded')
             lcd.lcd_clear()
             lcd.lcd_display_string('Can Loaded', 1)
-        elif safe_switch.is_pressed():
+        elif safe_switch.is_pressed:
             can_there = True
             print('Can Found')
             lcd.lcd_clear()
@@ -131,12 +169,11 @@ def load_can():
             print('Keep Moving')
     unhome()
     sleep(0.25)
-    if can_there and not safe_switch.is_pressed():
+    if can_there and not safe_switch.is_pressed:
         can_loaded = True
         print('Can Loaded')
         lcd.lcd_clear()
         lcd.lcd_display_string('Can Loaded', 1)
-
     if can_there and can_loaded:
         return True
     else:
@@ -196,16 +233,16 @@ def countdown(n):
 def need_pressure():
     nts = ti()
     time_diff = nts - ts
-    if time_diff >= 144000:
-        print("Time greater than 40 hours")
+    if time_diff >= 72000:
+        print("Time greater than 20 hours")
         return 40
-    elif time_diff <= 3600:
-        print("Time less than 1 hour")
-        return 1
+    elif time_diff <= 1800:
+        print("Time less than 30 min")
+        return 5
     else:
         print("time_diff = ", str(time_diff))
         print("Calculating required time...")
-        pressure_time_ratio = round(time_diff / 3600)
+        pressure_time_ratio = round(time_diff / 1800)
         return pressure_time_ratio
 
 def runCycler():
@@ -227,14 +264,13 @@ def runCycler():
             lcd.lcd_display_string("Max 5 exceeded!!", 1)
             lcd.lcd_display_string("Reset in 10 sec", 2)
             sleep(10)
-            compressor.value(1)
+            compressor.off()
     else:
             lcd.lcd_clear()
             lcd.lcd_display_string("No more cans!!", 1 )
             lcd.lcd_display_string("Reset in 10 sec", 2)
             sleep(10)
-            compressor.value(1)
-
+            compressor.off()
     home()
     ts = ti()
     print("Timestamp reset to", str(ts))
@@ -252,7 +288,7 @@ lcd.lcd_display_string("Power-On-", 1)
 lcd.lcd_display_string("Self-Test", 2)
 sleep(1)
 compressor.on()
-countdown(40)
+countdown(30)
 compressor.off()
 ts = ti()
 print("Timestamp reset to", str(ts))
