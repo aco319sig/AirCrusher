@@ -225,7 +225,7 @@ def countdown(n):
         thisSecond = str(n)
         lcd.lcd_display_string( 'Pressurizing....', 1)
         thisMessage = ''
-        thisMessage = str('Countdown = ' + n)
+        thisMessage = str('Countdown = ' + str(n))
         lcd.lcd_display_string(thisMessage, 2)
         n = n -1
         sleep(0.8)
