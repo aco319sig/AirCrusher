@@ -30,70 +30,53 @@ import drivers
 from time import sleep
 from time import time as ti
 
-#from machine import I2C, Pin
-#from lcd_api import LcdApi
-#from i2c_lcd import I2cLcd
-lcd = drivers.Lcd()
 
 sleep(1.5)
 home_pin = 14
-# old start_pin = 2
-start_pin = 4
-# reset_pin = 28
-# load_pin = 6
-# retract_pin = 7
-# l1 = 25
-# l2 = 0
-# old_disp_sda = 4
+start_pin = 20
+reset_pin = 16
+load_pin = 7
+retract_pin = 8
+l1 = 17
+l2 = 21
 disp_sda = 2
-# old_disp_scl = 5
 disp_scl = 3
-# crushPin = 20
-# compPin = 22
-# case_safety = 16
+crushPin = 19
+compPin = 13
+case_safety = 15
 ts = ti()
 nts = ''
 
 # Non-Class devices
-# led1 = Pin(l1, Pin.OUT)
-# led2 = Pin(l2, Pin.OUT)
-# home_switch = Pin(home_pin, Pin.IN, Pin.PULL_UP)
-# safe_switch = Pin(case_safety, Pin.IN, Pin.PULL_UP)
-# start_button = Pin(start_pin, Pin.IN, Pin.PULL_UP)
-# reset_button = Pin(reset_pin, Pin.IN, Pin.PULL_UP)
-# load = Pin(load_pin, Pin.OUT)
-# retract = Pin(retract_pin, Pin.OUT)
-# crusher = Pin(crushPin, Pin.OUT)
-# crusher.value(1)
-# compressor = Pin(compPin, Pin.OUT)
-# compressor.value(1)
-
-### LCD Display Creation
-# Find and define Display
-i2c = I2C(0, sda=Pin(disp_sda), scl=Pin(disp_scl), freq=400000)
-I2C_ADDR = i2c.scan()[0]
-#I2C_ADDR = 0x27
-totalRows = 2
-totalColumns = 16
+led1 = Pin(l1, Pin.OUT)
+led2 = Pin(l2, Pin.OUT)
+home_switch = Pin(home_pin, Pin.IN, Pin.PULL_UP)
+safe_switch = Pin(case_safety, Pin.IN, Pin.PULL_UP)
+start_button = Pin(start_pin, Pin.IN, Pin.PULL_UP)
+reset_button = Pin(reset_pin, Pin.IN, Pin.PULL_UP)
+load = Pin(load_pin, Pin.OUT)
+retract = Pin(retract_pin, Pin.OUT)
+crusher = Pin(crushPin, Pin.OUT)
+crusher.value(1)
+compressor = Pin(compPin, Pin.OUT)
+compressor.value(1)
 
 ### Instantiate classes
 # Create display instance
-lcd = I2cLcd(i2c, I2C_ADDR, totalRows, totalColumns)
+lcd = drivers.Lcd()
 
 def is_safe():
     if safe_switch.value():
-        lcd.clear()
-        lcd.putstr('Rotator Jammed')
+        lcd.lcd_clear()
+        lcd.lcd_display_string('Rotator Jammed', 1)
         print("Rotator is Jammed!")
         sys.exit()
     else:
-        lcd.clear()
-        lcd.putstr('Safe to Run')
+        lcd.lcd_clear()
+        lcd.lcd_display_string('Safe to Run', 1)
         print("Safe to run")
         return True
 
-# Create Loader
-# s1 = Stepper.create(Pin(p1,Pin.OUT),Pin(p2,Pin.OUT),Pin(p3,Pin.OUT),Pin(p4,Pin.OUT),Pin(l1,Pin.OUT),Pin(ir1,Pin.IN,Pin.PULL_UP),delay=2)
 def home():
     is_safe()
     global ts
@@ -108,14 +91,15 @@ def home():
         else:
             if safe_switch.value() == 0:
                 print('Safe Passed')
-                lcd.clear()
-                lcd.putstr('Loader ready')
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Loader ready', 1)
+                lcd.lcd_display_string('Grn Btn first!', 2)
                 blink()
                 return True
             else:
                 print('Home function timed out')
-                lcd.clear()
-                lcd.putstr('Timeout...')
+                lcd.lcd_clear()
+                lcd.lcd_display_string('Timeout...', 1)
                 blink_error()
                 return False
     except KeyboardInterrupt:
@@ -126,12 +110,12 @@ def home():
 def load_can():
     if is_safe():
         sleep(1)
-        lcd.clear()
-        lcd.putstr('Safe passed')
+        lcd.lcd_clear()
+        lcd.lcd_display_string('Safe passed', 1)
 
     can_there = False
     can_loaded = False
-    lcd.clear()
+    lcd.lcd_clear()
     while not home_switch.value() == 0:
         load.value(1)
         sleep(0.1)
@@ -139,13 +123,13 @@ def load_can():
         if can_there and safe_switch.value() == 0:
             can_loaded = True
             print('Can Loaded')
-            lcd.clear()
-            lcd.putstr('Can Loaded')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Can Loaded', 1)
         elif safe_switch.value() == 1:
             can_there = True
             print('Can Found')
-            lcd.clear()
-            lcd.putstr('Can Found')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Can Found', 1)
         else:
             print('Keep Moving')
     unhome()
@@ -153,8 +137,8 @@ def load_can():
     if can_there and safe_switch.value() == 0:
         can_loaded = True
         print('Can Loaded')
-        lcd.clear()
-        lcd.putstr('Can Loaded')
+        lcd.lcd_clear()
+        lcd.lcd_display_string('Can Loaded', 1)
 
     if can_there and can_loaded:
         return True
@@ -176,13 +160,13 @@ def b_inch(val=0.25):
     retract.value(0)
 
 def crush_it():
-    lcd.clear()
-    lcd.putstr("Crushing!!")
+    lcd.lcd_clear()
+    lcd.lcd_display_string("Crushing!!", 1)
     sleep(0.5)
     crusher.value(0)
     sleep(1)
-    lcd.clear()
-    lcd.putstr("Retracting!!")
+    # lcd.lcd_clear()
+    lcd.lcd_display_string("Retracting!!", 2)
     crusher.value(1)
     sleep(2)
 
@@ -219,10 +203,12 @@ def blink_error():
 def countdown(n):
     while n>0:
         print(str(n), 'seconds left')
-        lcd.clear()
+        lcd.lcd_clear()
         thisSecond = str(n)
-        lcd.putstr( 'Pressurizing....Countdown = ')
-        lcd.putstr(thisSecond)
+        lcd.lcd_display_string( 'Pressurizing....', 1)
+        thisMessage = ''
+        thisMessage = str('Countdown = ' + n)
+        lcd.lcd_display_string(thisMessage, 2)
         n = n -1
         sleep(0.8)
 
@@ -257,13 +243,15 @@ def runCycler():
             sleep(2)
             count -= 1
         else:
-            lcd.clear()
-            lcd.putstr("Max 5 exceeded!!Reset in 10 sec")
+            lcd.lcd_clear()
+            lcd.lcd_display_string("Max 5 exceeded!!", 1)
+            lcd.lcd_display_string("Reset in 10 sec", 2)
             sleep(10)
             compressor.value(1)
     else:
-            lcd.clear()
-            lcd.putstr("No more cans!!  Reset in 10 sec")
+            lcd.lcd_clear()
+            lcd.lcd_display_string("No more cans!!", 1 )
+            lcd.lcd_display_string("Reset in 10 sec", 2)
             sleep(10)
             compressor.value(1)
 
@@ -279,9 +267,10 @@ def runCycler():
 is_safe()
 print("Safety Check Done")
 # Acknowedge power on
-lcd.clear()
-lcd.putstr("Power-On-Self-  Test")
-blink_error()
+lcd.lcd_clear()
+lcd.lcd_display_string("Power-On-", 1)
+lcd.lcd_display_string("Self-  Test", 2)
+sleep(1)
 compressor.value(0)
 countdown(40)
 compressor.value(1)
@@ -291,14 +280,12 @@ print("Timestamp reset to", str(ts))
 # Ensure crusher is retracted at start
 crusher.value(1)
 
-# show dict
-lcd.__dict__
-
 # Home the rotor
-lcd.clear()
-lcd.putstr("Homing loader   for first time")
+lcd.lcd_clear()
+lcd.lcd_display_string("Homing loader", 1)
+lcd.lcd_display_string("for first time", 2)
 sleep(2)
-lcd.clear()
+lcd.lcd_clear()
 home()
 # Wait for Start Button
 try:
@@ -309,18 +296,18 @@ try:
         second = start_button.value()
         r_second = reset_button.value()
         if first and not second:
-            lcd.clear()
-            lcd.putstr('Start pressed!')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Start pressed!', 1)
         elif not first and second:
-            lcd.clear()
-            lcd.putstr('Start released!')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Start released!', 1)
             runCycler()
         elif r_first and not r_second:
-            lcd.clear()
-            lcd.putstr('Reset Pressed')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Reset Pressed', 1)
         elif not r_first and r_second:
-            lcd.clear()
-            lcd.putstr('Reset released')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Reset released', 1)
             compressor.value(0)
             want_pressure = need_pressure()
             if want_pressure < 10:
@@ -331,8 +318,9 @@ try:
             print("Timestamp reset to", str(ts))
 
 except KeyboardInterrupt:
-    lcd.clear()
-    lcd.putstr('Program terminated by KBI')
+    lcd.lcd_clear()
+    lcd.lcd_display_string('Program Stop", 1)
+    lcd.lcd_display_string("by KBI',2)
     crusher.value(1)
     compressor.value(1)
     led1.value(0)
