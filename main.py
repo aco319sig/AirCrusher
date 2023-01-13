@@ -319,8 +319,8 @@ try:
 
 except KeyboardInterrupt:
     lcd.lcd_clear()
-    lcd.lcd_display_string('Program Stop", 1)
-    lcd.lcd_display_string("by KBI',2)
+    lcd.lcd_display_string('Program Stop', 1)
+    lcd.lcd_display_string('by KBI',2)
     crusher.value(1)
     compressor.value(1)
     led1.value(0)
