@@ -274,8 +274,8 @@ def runCycler():
     home()
     ts = ti()
     print("Timestamp reset to", str(ts))
-    led1.value(0)
-    led2.value(0)
+    led1.off()
+    led2.off()
 
 
 ## Beginning of commands ##
@@ -306,11 +306,11 @@ home()
 # Wait for Start Button
 try:
     while True:
-        first = start_button.value()
-        r_first = reset_button.value()
+        first = start_button.value
+        r_first = reset_button.value
         sleep(0.01)
-        second = start_button.value()
-        r_second = reset_button.value()
+        second = start_button.value
+        r_second = reset_button.value
         if first and not second:
             lcd.lcd_clear()
             lcd.lcd_display_string('Start pressed!', 1)
