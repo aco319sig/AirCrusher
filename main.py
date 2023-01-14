@@ -155,7 +155,7 @@ def load_can():
     can_there = False
     can_loaded = False
     lcd.lcd_clear()
-    delay = ti() + 4
+    delay = ti() + 3
     while not home_switch.is_pressed:
         loader.forward()
         sleep(0.25)
@@ -345,6 +345,9 @@ try:
             compressor.off()
             ts = ti()
             print("Timestamp reset to", str(ts))
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Loader ready', 1)
+            lcd.lcd_display_string('Red To Start', 2)
 
 except KeyboardInterrupt:
     lcd.lcd_clear()
