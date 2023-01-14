@@ -155,9 +155,17 @@ def load_can():
     can_there = False
     can_loaded = False
     lcd.lcd_clear()
+    delay = ti() + 4
     while not home_switch.is_pressed:
         loader.forward()
         sleep(0.25)
+        if ti() > delay:
+            print('Loader Jammed!')
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Timeout reached!', 1)
+            lcd.lcd_display_string('Loader Jammed!', 2)
+            back_off()
+            return False
         if can_there and not safe_switch.is_pressed:
             can_loaded = True
             print('Can Loaded')
@@ -181,6 +189,11 @@ def load_can():
         return True
     else:
         return False
+
+def back_off():
+    loader.backward()
+    sleep(0.5)
+    loader.stop()
 
 def unhome():
     print("unhoming")
