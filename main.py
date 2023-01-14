@@ -261,25 +261,19 @@ def runCycler():
     led2.on()
     count = 5
     while load_can():
-        if count > 0:
-            crush_it()
-            sleep(2)
-            count -= 1
-        else:
-            lcd.lcd_clear()
-            lcd.lcd_display_string("Max 5 exceeded!!", 1)
-            lcd.lcd_display_string("Reset in 10 sec", 2)
-            sleep(10)
-            compressor.off()
+        crush_it()
+        sleep(2)
     else:
-            lcd.lcd_clear()
-            lcd.lcd_display_string("No more cans!!", 1 )
-            lcd.lcd_display_string("Reset in 10 sec", 2)
-            sleep(10)
-            compressor.off()
-    home()
+        lcd.lcd_clear()
+        lcd.lcd_display_string("No more cans!!", 1 )
+        lcd.lcd_display_string("Reset in 10 sec", 2)
+        sleep(10)
+        compressor.off()
     ts = ti()
     print("Timestamp reset to", str(ts))
+    lcd.lcd_clear()
+    lcd.lcd_display_string('Loader ready', 1)
+    lcd.lcd_display_string('Green first!', 2)
     led1.off()
     led2.off()
 
