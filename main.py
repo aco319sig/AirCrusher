@@ -224,6 +224,8 @@ def crush_it():
     lcd.lcd_display_string("Retracting!!", 2)
     crusher.off()
     sleep(0.5)
+    lcd.lcd_clear()
+    lcd.lcd_display_string("Crush Complete", 1)
     compressor.on()
     sleep(2)
 
@@ -252,16 +254,16 @@ def countdown(n):
 def need_pressure():
     nts = ti()
     time_diff = nts - ts
-    if time_diff >= 72000:
-        print("Time greater than 20 hours")
+    if time_diff >= 36000:
+        print("Time greater than 10 hours")
         return 40
-    elif time_diff <= 1800:
-        print("Time less than 30 min")
+    elif time_diff <= 600:
+        print("Time less than 10 min")
         return 5
     else:
         print("time_diff = ", str(time_diff))
         print("Calculating required time...")
-        pressure_time_ratio = round(time_diff / 1800)
+        pressure_time_ratio = round(time_diff / 1200)
         return pressure_time_ratio
 
 def runCycler():
@@ -272,10 +274,9 @@ def runCycler():
     crush_it()
     led1.on()
     led2.on()
-    count = 5
     while load_can():
         crush_it()
-        sleep(2)
+        sleep(4)
     else:
         lcd.lcd_clear()
         lcd.lcd_display_string("No more cans!!", 1 )
@@ -339,9 +340,10 @@ try:
             lcd.lcd_display_string('Reset released', 1)
             compressor.on()
             want_pressure = need_pressure()
-            if want_pressure < 10:
-                want_pressure = 10
+            if want_pressure < 15:
+                want_pressure = 15
             countdown(want_pressure)
+            runCycler()
             compressor.off()
             ts = ti()
             print("Timestamp reset to", str(ts))
