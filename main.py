@@ -126,7 +126,15 @@ def home():
             compressor.on()
             countdown(need_pressure())
             crush_it()
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Can Found', 1)
+            lcd.lcd_display_string('and Crushed!', 2)
+            sleep(3)
             compressor.off()
+            lcd.lcd_clear()
+            lcd.lcd_display_string('Loader ready', 1)
+            lcd.lcd_display_string('Green first!', 2)
+            blink()
         else:
             if not safe_switch.is_pressed:
                 print('Safe Passed')
