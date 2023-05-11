@@ -262,10 +262,10 @@ def countdown(n):
 def need_pressure():
     nts = ti()
     time_diff = nts - ts
-    if time_diff >= 36000:
+    if time_diff >= 2500:
         print("Time greater than 10 hours")
-        return 40
-    elif time_diff <= 600:
+        return 20
+    elif time_diff <= 400:
         print("Time less than 10 min")
         return 5
     else:
@@ -284,7 +284,7 @@ def runCycler():
     led2.on()
     while load_can():
         crush_it()
-        sleep(4)
+        sleep(5)
     else:
         lcd.lcd_clear()
         lcd.lcd_display_string("No more cans!!", 1 )
