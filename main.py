@@ -32,7 +32,7 @@ from time import time as ti
 from gpiozero import Button, LED, Motor, DigitalOutputDevice
 
 sleep(1.5)
-home_pin = 23
+home_pin = 25
 start_pin = 20
 reset_pin = 16
 load_pin = 8
