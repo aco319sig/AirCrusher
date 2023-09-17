@@ -3,19 +3,19 @@ Micropython module for Automated Can Crusher using the following hardware:
 Raspberry Pi 3 B+
 Breakout Board w/ screw terminals
 Wolfwhoop PW-D Control Buck Converter
-    6-24V to 5V 1.5A Step-Down Regulator Module Power Inverter Volt Stabilizer
-    (One needed to power Pico all by itself, due to voltage drop, other to power sensors, relays, and driver)
+	6-24V to 5V 1.5A Step-Down Regulator Module Power Inverter Volt Stabilizer
+	(One needed to power Pico all by itself, due to voltage drop, other to power sensors, relays, and driver)
 IR Break Beam Sensor ( 2 sets )
 28BYJ-48 ULN2003 5V Stepper Motor + ULN2003 Driver Board
 DC 5V Relay Module with Optocoupler Low Level Trigger Expansion Board
 Pneumatic Tubing Pipe 3/8" OD Blue Air Compressor PU Line Hose
 TAILONZ PNEUMATIC 3/8"NPT Solenoid Valve 4V310-10 12V
 TAILONZ PNEUMATIC Air Cylinder
-    Bore: 2 1/2 inch (63mm)
-    Stroke: 6 inch (150mm)
-    Piston type: Screwed Piston Rod
-    Dual Action (Air powered exttend and retract)
-    (additional fittings will be needed to connect to valve, see next item:)
+	Bore: 2 1/2 inch (63mm)
+	Stroke: 6 inch (150mm)
+	Piston type: Screwed Piston Rod
+	Dual Action (Air powered exttend and retract)
+	(additional fittings will be needed to connect to valve, see next item:)
 Male Straight 3/8 Inch Tube OD x 3/8 Inch NPT Thread Push to Connect Fittings
 
 Various wiring and power distribution choices, none of which matter to construction.
@@ -68,316 +68,317 @@ compressor.off()
 lcd = drivers.Lcd()
 
 def switch_test():
-    try:
-        while True:
-            if start_button.is_pressed:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Start Pressed', 1)
-            else:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Start released', 1)
-            sleep(2)
-            if reset_button.is_pressed:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Reset Pressed', 1)
-            else:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Reset released', 1)
-            sleep(2)
-            if safe_switch.is_pressed:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Safe Pressed', 1)
-            else:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Safe released', 1)
-            sleep(2)
-            if home_switch.is_pressed:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Home Pressed', 1)
-            else:
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Home released', 1)
-            sleep(2)
-    except KeyboardInterrupt:
-        # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
-        print("Cleaning up!")
-        display.lcd_clear()
-        lcd.lcd_display_string('Exiting debug', 1)
-        sleep(3)
-        display.lcd_clear()
+	try:
+		while True:
+			if start_button.is_pressed:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Start Pressed', 1)
+			else:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Start released', 1)
+			sleep(2)
+			if reset_button.is_pressed:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Reset Pressed', 1)
+			else:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Reset released', 1)
+			sleep(2)
+			if safe_switch.is_pressed:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Safe Pressed', 1)
+			else:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Safe released', 1)
+			sleep(2)
+			if home_switch.is_pressed:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Home Pressed', 1)
+			else:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Home released', 1)
+			sleep(2)
+	except KeyboardInterrupt:
+		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
+		print("Cleaning up!")
+		display.lcd_clear()
+		lcd.lcd_display_string('Exiting debug', 1)
+		sleep(3)
+		display.lcd_clear()
 
 def is_safe():
-    if safe_switch.is_pressed:
-        lcd.lcd_clear()
-        lcd.lcd_display_string('Rotator Jammed', 1)
-        print("Rotator is Jammed!")
-        sys.exit()
-    else:
-        lcd.lcd_clear()
-        lcd.lcd_display_string('Safe to Run', 1)
-        print("Safe to run")
-        return True
+	if safe_switch.is_pressed:
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Rotator Jammed', 1)
+		print("Rotator is Jammed!")
+		sys.exit()
+	else:
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Safe to Run', 1)
+		print("Safe to run")
+		return True
 
 def lcd_timer():
-    nts = ti()
-    time_diff = nts - ts
-    if time_diff >= 900:
-        return True
-    else:
-        return False
+	nts = ti()
+	time_diff = nts - ts
+	if time_diff >= 900:
+		return True
+	else:
+		return False
 
 def lcd_change_color(need):
-    global lcd_status
-    if lcd_status == need:
-        pass
-    else:
-        lcd.lcd_clear()
-        lcd.lcd_display_string('Loader ready', 1)
-        lcd.lcd_display_string(need + ' to start', 2)
-        lcd_status = need
-        print('lcd_status set to ' + need)
+	global lcd_status
+	if lcd_status == need:
+		pass
+	else:
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Loader ready', 1)
+		lcd.lcd_display_string(need + ' to start', 2)
+		lcd_status = need
+		print('lcd_status set to ' + need)
 
 def lcd_timeout_test():
-    global lcd_timeout
-    lcd_timeout = lcd_timer()
-    if lcd_timeout:
-        lcd_change_color('Green')
-    else:
-        lcd_change_color('Red')
+	global lcd_timeout
+	lcd_timeout = lcd_timer()
+	if lcd_timeout:
+		lcd_change_color('Green')
+	else:
+		lcd_change_color('Red')
 
 def home():
-    is_safe()
-    global ts
-    looptime = ti()
-    try:
-        led1.on()
-        if load_can():
-            # Add pressure check function here later
-            compressor.on()
-            countdown(need_pressure())
-            crush_it()
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Can Found', 1)
-            lcd.lcd_display_string('and Crushed!', 2)
-            sleep(3)
-            compressor.off()
-            lcd_timeout_test()
-            blink()
-        else:
-            if not safe_switch.is_pressed:
-                print('Safe Passed')
-                lcd_timeout_test()
-                compressor.off()
-                blink()
-                return True
-            else:
-                print('Home function timed out')
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Timeout...', 1)
-                blink_error()
-                return False
-    except KeyboardInterrupt:
-        print('Program terminated by KBI')
-        led1.off()
-        return False
+	is_safe()
+	global ts
+	looptime = ti()
+	try:
+		led1.on()
+		if load_can():
+			# Add pressure check function here later
+			compressor.on()
+			countdown(need_pressure())
+			crush_it()
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Can Found', 1)
+			lcd.lcd_display_string('and Crushed!', 2)
+			sleep(3)
+			compressor.off()
+			lcd_timeout_test()
+			blink()
+		else:
+			if not safe_switch.is_pressed:
+				print('Safe Passed')
+				lcd_timeout_test()
+				compressor.off()
+				blink()
+				return True
+			else:
+				print('Home function timed out')
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Timeout...', 1)
+				blink_error()
+				return False
+	except KeyboardInterrupt:
+		print('Program terminated by KBI')
+		led1.off()
+		return False
 
 def load_can():
-    if is_safe():
-        sleep(1)
-        lcd.lcd_clear()
-        lcd.lcd_display_string('Safe passed', 1)
-    can_there = False
-    can_loaded = False
-    lcd.lcd_clear()
-    delay = ti() + 3
-    while not home_switch.is_pressed:
-        loader.forward()
-        sleep(0.25)
-        if ti() > delay:
-            print('Loader Jammed!')
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Timeout reached!', 1)
-            lcd.lcd_display_string('Loader Jammed!', 2)
-            back_off()
-            return False
-        if can_there and not safe_switch.is_pressed:
-            can_loaded = True
-            print('Can Loaded')
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Can Loaded', 1)
-        elif safe_switch.is_pressed:
-            can_there = True
-            print('Can Found')
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Can Found', 1)
-        else:
-            print('Keep Moving')
-    unhome()
-    sleep(0.25)
-    if can_there and not safe_switch.is_pressed:
-        can_loaded = True
-        print('Can Loaded')
-        lcd.lcd_clear()
-        lcd.lcd_display_string('Can Loaded', 1)
-    if can_there and can_loaded:
-        return True
-    else:
-        return False
+	if is_safe():
+		sleep(1)
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Safe passed', 1)
+	can_there = False
+	can_loaded = False
+	lcd.lcd_clear()
+	delay = ti() + 3
+	while not home_switch.is_pressed:
+		loader.forward()
+		sleep(0.25)
+		if ti() > delay:
+			print('Loader Jammed!')
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Timeout reached!', 1)
+			lcd.lcd_display_string('Loader Jammed!', 2)
+			back_off()
+			return False
+		if can_there and not safe_switch.is_pressed:
+			can_loaded = True
+			print('Can Loaded')
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Can Loaded', 1)
+		elif safe_switch.is_pressed:
+			can_there = True
+			print('Can Found')
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Can Found', 1)
+		else:
+			print('Keep Moving')
+	unhome()
+	sleep(0.25)
+	if can_there and not safe_switch.is_pressed:
+		can_loaded = True
+		print('Can Loaded')
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Can Loaded', 1)
+	if can_there and can_loaded:
+		return True
+	else:
+		return False
 
 def back_off():
-    loader.backward()
-    sleep(0.5)
-    loader.stop()
+	loader.backward()
+	sleep(0.5)
+	loader.stop()
 
 def unhome():
-    print("unhoming")
-    loader.forward()
-    home_switch.wait_for_release()
-    loader.stop()
+	print("unhoming")
+	loader.forward()
+	home_switch.wait_for_release()
+	loader.stop()
 
 def f_inch(val=0.25):
-    loader.forward()
-    sleep(val)
-    loader.stop()
+	loader.forward()
+	sleep(val)
+	loader.stop()
 
 def b_inch(val=0.25):
-    loader.reverse()
-    sleep(val)
-    loader.stop()
+	loader.reverse()
+	sleep(val)
+	loader.stop()
 
 def crush_it():
-    print("Crushing")
-    lcd.lcd_clear()
-    lcd.lcd_display_string("Crushing!!", 1)
-    compressor.off()
-    sleep(0.5)
-    crusher.on()
-    sleep(1)
-    # lcd.lcd_clear()
-    print("Retracting")
-    lcd.lcd_display_string("Retracting!!", 2)
-    crusher.off()
-    sleep(0.5)
-    lcd.lcd_clear()
-    lcd.lcd_display_string("Crush Complete", 1)
-    compressor.on()
-    sleep(2)
+	print("Crushing")
+	lcd.lcd_clear()
+	lcd.lcd_display_string("Crushing!!", 1)
+	compressor.off()
+	sleep(0.5)
+	crusher.on()
+	sleep(1)
+	# lcd.lcd_clear()
+	print("Retracting")
+	lcd.lcd_display_string("Retracting!!", 2)
+	crusher.off()
+	sleep(0.5)
+	lcd.lcd_clear()
+	lcd.lcd_display_string("Crush Complete", 1)
+	compressor.on()
+	sleep(2)
 
 def blink():
-    print("blink")
-    led1.blink(on_time=0.07, off_time=0.07, n=10, background=False)
-    led2.blink(on_time=0.07, off_time=0.07, n=10, background=False)
+	print("blink")
+	led1.blink(on_time=0.07, off_time=0.07, n=10, background=False)
+	led2.blink(on_time=0.07, off_time=0.07, n=10, background=False)
 
 def blink_error():
-    print("blink_error")
-    led1.blink(on_time=0.5, off_time=0.5, n=3, background=False)
-    led2.blink(on_time=0.5, off_time=0.5, n=3, background=False)
+	print("blink_error")
+	led1.blink(on_time=0.5, off_time=0.5, n=3, background=False)
+	led2.blink(on_time=0.5, off_time=0.5, n=3, background=False)
 
 def countdown(n):
-    while n>0:
-        print(str(n), 'seconds left')
-        lcd.lcd_clear()
-        thisSecond = str(n)
-        lcd.lcd_display_string( 'Pressurizing....', 1)
-        thisMessage = ''
-        thisMessage = str('Countdown = ' + str(n))
-        lcd.lcd_display_string(thisMessage, 2)
-        n = n -1
-        sleep(0.8)
+	while n>0:
+		print(str(n), 'seconds left')
+		lcd.lcd_clear()
+		thisSecond = str(n)
+		lcd.lcd_display_string( 'Pressurizing....', 1)
+		thisMessage = ''
+		thisMessage = str('Countdown = ' + str(n))
+		lcd.lcd_display_string(thisMessage, 2)
+		n = n -1
+		sleep(0.8)
 
 def need_pressure():
-    nts = ti()
-    time_diff = nts - ts
-    if time_diff >= 2400:
-        print("Time greater than 40 min")
-        return 17
-    elif time_diff <= 420:
-        print("Time less than 7 min")
-        return 5
-    else:
-        print("time_diff = ", str(time_diff))
-        print("Calculating required time...")
-        pressure_time_ratio = round(time_diff / 140)
-        return pressure_time_ratio
+	nts = ti()
+	time_diff = nts - ts
+	if time_diff >= 2400:
+		print("Time greater than 40 min")
+		return 17
+	elif time_diff <= 420:
+		print("Time less than 7 min")
+		return 5
+	else:
+		print("time_diff = ", str(time_diff))
+		print("Calculating required time...")
+		pressure_time_ratio = round(time_diff / 140)
+		return pressure_time_ratio
 
-set_time_stamp():
-    global ts
-    file_name = "./time.ini" #file to be searched
-    check_file = os.path.isfile(file_name)
-    if check_file:
-        config_obj = configparser.ConfigParser()
-        config_obj.read(file_name)
-        time_group = config_obj["time_stamp"]
-        last_time = time_group["last_time"]
-        print('Previous time stamp: ' + str(last_time))
-        ts = ti()
-        config_obj.set('time_stamp', 'last_time', str(ts))
-        configFile = open(file_name, 'w')
-        config_obj.write(configFile)
-        configFile.close()
-        print('New timestamp set: ' + str(ts))
-    else:
-        ts = ti()
-        new_ts = str(ts)
-        config_obj = configparser.ConfigParser()
-        config_obj["time_stamp"] = {
-        "last_time" = new_ts
-        }
-        configFile = open(file_name, 'w')
-        config_obj.write(configFile)
-        configFile.close()
-        print("New time.ini file created.")
-        print('New timestamp set: ' + new_ts)
 
-read_time_stamp():
-    file_name = "./time.ini" #file to be searched
-    check_file = os.path.isfile(file_name)
-    time_now = ti()
-    if check_file:
-        config_obj = configparser.ConfigParser()
-        config_obj.read(file_name)
-        time_group = config_obj["time_stamp"]
-        last_time = float(time_group["last_time"])
-        time_diff = time_now - last_time
-        print('Recorded Time Stamp from file: ' + str(last_time))
-        print('Diff = ' + str(time_diff))
-        if time_diff >= 2400:
-            print("Time greater than 40 min")
-            return 30
-        elif time_diff <= 420:
-            print("Time less than 7 min")
-            return 5
-        else:
-            print("time_diff = ", str(time_diff))
-            print("Calculating required time...")
-            pressure_time_ratio = round(time_diff / 80)
-            return pressure_time_ratio
-    else:
-        time_diff = 30
-        return time_diff
+def set_time_stamp():
+	global ts
+	file_name = "./time.ini" #file to be searched
+	check_file = os.path.isfile(file_name)
+	if check_file:
+		config_obj = configparser.ConfigParser()
+		config_obj.read(file_name)
+		time_group = config_obj["time_stamp"]
+		last_time = time_group["last_time"]
+		print('Previous time stamp: ' + str(last_time))
+		ts = ti()
+		config_obj.set('time_stamp', 'last_time', str(ts))
+		configFile = open(file_name, 'w')
+		config_obj.write(configFile)
+		configFile.close()
+		print('New timestamp set: ' + str(ts))
+	else:
+		ts = ti()
+		new_ts = str(ts)
+		config_obj = configparser.ConfigParser()
+		config_obj["time_stamp"] = {
+			"last_time" = new_ts
+		}
+		configFile = open(file_name, 'w')
+		config_obj.write(configFile)
+		configFile.close()
+		print("New time.ini file created.")
+		print('New timestamp set: ' + new_ts)
+
+def read_time_stamp():
+	file_name = "./time.ini" #file to be searched
+	check_file = os.path.isfile(file_name)
+	time_now = ti()
+	if check_file:
+		config_obj = configparser.ConfigParser()
+		config_obj.read(file_name)
+		time_group = config_obj["time_stamp"]
+		last_time = float(time_group["last_time"])
+		time_diff = time_now - last_time
+		print('Recorded Time Stamp from file: ' + str(last_time))
+		print('Diff = ' + str(time_diff))
+		if time_diff >= 2400:
+			print("Time greater than 40 min")
+			return 30
+		elif time_diff <= 420:
+			print("Time less than 7 min")
+			return 5
+		else:
+			print("time_diff = ", str(time_diff))
+			print("Calculating required time...")
+			pressure_time_ratio = round(time_diff / 80)
+			return pressure_time_ratio
+	else:
+		time_diff = 30
+		return time_diff
 
 def runCycler():
-    global ts
-    # Add pressure check function here later
-    compressor.on()
-    countdown(need_pressure())
-    crush_it()
-    led1.on()
-    led2.on()
-    while load_can():
-        crush_it()
-        sleep(5)
-    else:
-        lcd.lcd_clear()
-        lcd.lcd_display_string("No more cans!!", 1 )
-        lcd.lcd_display_string("Reset in 10 sec", 2)
-        sleep(10)
-        compressor.off()
-    set_time_stamp()
-    print("Timestamp reset to", str(ts))
-    lcd_timeout_test()
-    led1.off()
-    led2.off()
+	global ts
+	# Add pressure check function here later
+	compressor.on()
+	countdown(need_pressure())
+	crush_it()
+	led1.on()
+	led2.on()
+	while load_can():
+		crush_it()
+		sleep(5)
+	else:
+		lcd.lcd_clear()
+		lcd.lcd_display_string("No more cans!!", 1 )
+		lcd.lcd_display_string("Reset in 10 sec", 2)
+		sleep(10)
+		compressor.off()
+	set_time_stamp()
+	print("Timestamp reset to", str(ts))
+	lcd_timeout_test()
+	led1.off()
+	led2.off()
 
 ## Beginning of commands ##
 # Safety check
@@ -393,9 +394,9 @@ sleep(1)
 
 
 if len(sys.argv) >= 2:
-    n = int(sys.argv[1])
+	n = int(sys.argv[1])
 else:
-    n = read_time_stamp()
+	n = read_time_stamp()
 
 compressor.on()
 countdown(n)
@@ -415,45 +416,45 @@ lcd.lcd_clear()
 home()
 # Wait for Start Button
 try:
-    while True:
-        first = start_button.value
-        r_first = reset_button.value
-        sleep(0.01)
-        second = start_button.value
-        r_second = reset_button.value
-        lcd_timeout_test()
-        if first and not second:
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Start pressed!', 1)
-        elif not first and second:
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Start released!', 1)
-            runCycler()
-        elif r_first and not r_second:
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Reset Pressed', 1)
-        elif not r_first and r_second:
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Reset released', 1)
-            compressor.on()
-            want_pressure = need_pressure()
-            if want_pressure < 15:
-                want_pressure = 15
-            countdown(want_pressure)
-            runCycler()
-            compressor.off()
-            set_time_stamp()
-            print("Timestamp reset to", str(ts))
-            lcd_timeout_test()
+	while True:
+		first = start_button.value
+		r_first = reset_button.value
+		sleep(0.01)
+		second = start_button.value
+		r_second = reset_button.value
+		lcd_timeout_test()
+		if first and not second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Start pressed!', 1)
+		elif not first and second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Start released!', 1)
+			runCycler()
+		elif r_first and not r_second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Reset Pressed', 1)
+		elif not r_first and r_second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('Reset released', 1)
+			compressor.on()
+			want_pressure = need_pressure()
+			if want_pressure < 15:
+				want_pressure = 15
+			countdown(want_pressure)
+			runCycler()
+			compressor.off()
+			set_time_stamp()
+			print("Timestamp reset to", str(ts))
+			lcd_timeout_test()
 
 
 except KeyboardInterrupt:
-    lcd.lcd_clear()
-    lcd.lcd_display_string('Program Stop', 1)
-    lcd.lcd_display_string('by KBI',2)
-    loader.stop()
-    crusher.off()
-    compressor.off()
-    blink_error()
-    led1.off()
-    led2.off()
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Program Stop', 1)
+	lcd.lcd_display_string('by KBI',2)
+	loader.stop()
+	crusher.off()
+	compressor.off()
+	blink_error()
+	led1.off()
+	led2.off()
