@@ -121,19 +121,23 @@ def lcd_timer():
     nts = ti()
     time_diff = nts - ts
     if time_diff >= 900:
+        print('lcd_timer returned True')
         return True
     else:
+        print('lcd_timer returned False')
         return False
 
 def lcd_change_color(need):
     global lcd_status
     if lcd_status == need:
+        print('lcd_status unchanged, set to ' + need)
         pass
     else:
         lcd.lcd_clear()
         lcd.lcd_display_string('Loader ready', 1)
         lcd.lcd_display_string(need + ' to start', 2)
         lcd_status = need
+        print('lcd_status set to ' + need)
 
 def lcd_timeout_test():
     global lcd_timeout
