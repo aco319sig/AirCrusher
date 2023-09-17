@@ -373,7 +373,6 @@ def runCycler():
 		sleep(10)
 		compressor.off()
 	set_time_stamp()
-	print("Timestamp reset to", str(ts))
 	lcd_timeout_test()
 	led1.off()
 	led2.off()
