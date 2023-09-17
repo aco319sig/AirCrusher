@@ -121,16 +121,13 @@ def lcd_timer():
     nts = ti()
     time_diff = nts - ts
     if time_diff >= 900:
-        print('lcd_timer returned True')
         return True
     else:
-        print('lcd_timer returned False')
         return False
 
 def lcd_change_color(need):
     global lcd_status
     if lcd_status == need:
-        print('lcd_status unchanged, set to ' + need)
         pass
     else:
         lcd.lcd_clear()
