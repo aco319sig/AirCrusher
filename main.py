@@ -321,9 +321,8 @@ def set_time_stamp():
 		ts = ti()
 		new_ts = str(ts)
 		config_obj = configparser.ConfigParser()
-		config_obj["time_stamp"] = {
-			"last_time" = new_ts
-		}
+		config_obj.add_section("time_stamp")
+		config_obj.set("time_stamp", "last_time", new_ts)
 		configFile = open(file_name, 'w')
 		config_obj.write(configFile)
 		configFile.close()
