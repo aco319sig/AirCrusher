@@ -25,11 +25,11 @@ Physical loader is a 4 spoke paddle wheel design, with holes for ir
 break-beam sensors to detect both positioning and payload.
 
 """
-import sys
-import drivers
+import sys, drivers, threading
 from time import sleep
 from time import time as ti
 from gpiozero import Button, LED, Motor, DigitalOutputDevice
+
 
 sleep(1.5)
 home_pin = 25
@@ -46,6 +46,8 @@ compPin = 13
 case_safety = 24
 ts = ti()
 nts = ''
+lcd_timeout = True
+lcd_status = 'Green'
 
 # Non-Class devices
 led1 = LED(l1)
@@ -115,6 +117,32 @@ def is_safe():
         print("Safe to run")
         return True
 
+def lcd_timer():
+    nts = ti()
+    time_diff = nts - ts
+    if time_diff >= 900:
+        return True
+    else:
+        return False
+
+def lcd_change_color(need):
+    global lcd_status
+    if lcd_status == need:
+        pass
+    else:
+        lcd.lcd_clear()
+        lcd.lcd_display_string('Loader ready', 1)
+        lcd.lcd_display_string(need + ' to start', 2)
+        lcd_status = need
+
+def lcd_timeout_test():
+    global lcd_timeout
+    lcd_timeout = lcd_timer()
+    if lcd_timeout():
+        lcd_change_color(Green)
+    else:
+        lcd_change_color(Red)
+
 def home():
     is_safe()
     global ts
@@ -131,16 +159,12 @@ def home():
             lcd.lcd_display_string('and Crushed!', 2)
             sleep(3)
             compressor.off()
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Loader ready', 1)
-            lcd.lcd_display_string('Green first!', 2)
+            lcd_timeout_test()
             blink()
         else:
             if not safe_switch.is_pressed:
                 print('Safe Passed')
-                lcd.lcd_clear()
-                lcd.lcd_display_string('Loader ready', 1)
-                lcd.lcd_display_string('Green first!', 2)
+                lcd_timeout_test()
                 compressor.off()
                 blink()
                 return True
@@ -259,12 +283,13 @@ def countdown(n):
         n = n -1
         sleep(0.8)
 
+
 def need_pressure():
     nts = ti()
     time_diff = nts - ts
-    if time_diff >= 2500:
+    if time_diff >= 2400:
         print("Time greater than 10 hours")
-        return 20
+        return 17
     elif time_diff <= 400:
         print("Time less than 10 min")
         return 5
@@ -293,12 +318,9 @@ def runCycler():
         compressor.off()
     ts = ti()
     print("Timestamp reset to", str(ts))
-    lcd.lcd_clear()
-    lcd.lcd_display_string('Loader ready', 1)
-    lcd.lcd_display_string('Green first!', 2)
+    lcd_timeout_test()
     led1.off()
     led2.off()
-
 
 ## Beginning of commands ##
 # Safety check
@@ -333,6 +355,7 @@ try:
         sleep(0.01)
         second = start_button.value
         r_second = reset_button.value
+        lcd_timeout_test()
         if first and not second:
             lcd.lcd_clear()
             lcd.lcd_display_string('Start pressed!', 1)
@@ -355,9 +378,8 @@ try:
             compressor.off()
             ts = ti()
             print("Timestamp reset to", str(ts))
-            lcd.lcd_clear()
-            lcd.lcd_display_string('Loader ready', 1)
-            lcd.lcd_display_string('Red To Start', 2)
+            lcd_timeout_test()
+
 
 except KeyboardInterrupt:
     lcd.lcd_clear()
