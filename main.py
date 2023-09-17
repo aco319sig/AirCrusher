@@ -25,11 +25,12 @@ Physical loader is a 4 spoke paddle wheel design, with holes for ir
 break-beam sensors to detect both positioning and payload.
 
 """
-import sys, drivers, threading
+import sys, drivers, threading, configparser
 from time import sleep
 from time import time as ti
 from gpiozero import Button, LED, Motor, DigitalOutputDevice
-
+import os.path
+import os
 
 sleep(1.5)
 home_pin = 25
@@ -284,21 +285,76 @@ def countdown(n):
         n = n -1
         sleep(0.8)
 
-
 def need_pressure():
     nts = ti()
     time_diff = nts - ts
     if time_diff >= 2400:
-        print("Time greater than 10 hours")
+        print("Time greater than 40 min")
         return 17
-    elif time_diff <= 400:
-        print("Time less than 10 min")
+    elif time_diff <= 420:
+        print("Time less than 7 min")
         return 5
     else:
         print("time_diff = ", str(time_diff))
         print("Calculating required time...")
-        pressure_time_ratio = round(time_diff / 1200)
+        pressure_time_ratio = round(time_diff / 140)
         return pressure_time_ratio
+
+set_time_stamp():
+    global ts
+    file_name = "./time.ini" #file to be searched
+    check_file = os.path.isfile(file_name)
+    if check_file:
+        config_obj = configparser.ConfigParser()
+        config_obj.read(file_name)
+        time_group = config_obj["time_stamp"]
+        last_time = time_group["last_time"]
+        print('Previous time stamp: ' + str(last_time))
+        ts = ti()
+        config_obj.set('time_stamp', 'last_time', str(ts))
+        configFile = open(file_name, 'w')
+        config_obj.write(configFile)
+        configFile.close()
+        print('New timestamp set: ' + str(ts))
+    else:
+        ts = ti()
+        new_ts = str(ts)
+        config_obj = configparser.ConfigParser()
+        config_obj["time_stamp"] = {
+        "last_time" = new_ts
+        }
+        configFile = open(file_name, 'w')
+        config_obj.write(configFile)
+        configFile.close()
+        print("New time.ini file created.")
+        print('New timestamp set: ' + new_ts)
+
+read_time_stamp():
+    file_name = "./time.ini" #file to be searched
+    check_file = os.path.isfile(file_name)
+    time_now = ti()
+    if check_file:
+        config_obj = configparser.ConfigParser()
+        config_obj.read(file_name)
+        time_group = config_obj["time_stamp"]
+        last_time = float(time_group["last_time"])
+        time_diff = time_now - last_time
+        print('Recorded Time Stamp from file: ' + str(last_time))
+        print('Diff = ' + str(time_diff))
+        if time_diff >= 2400:
+            print("Time greater than 40 min")
+            return 30
+        elif time_diff <= 420:
+            print("Time less than 7 min")
+            return 5
+        else:
+            print("time_diff = ", str(time_diff))
+            print("Calculating required time...")
+            pressure_time_ratio = round(time_diff / 80)
+            return pressure_time_ratio
+    else:
+        time_diff = 30
+        return time_diff
 
 def runCycler():
     global ts
@@ -317,7 +373,7 @@ def runCycler():
         lcd.lcd_display_string("Reset in 10 sec", 2)
         sleep(10)
         compressor.off()
-    ts = ti()
+    set_time_stamp()
     print("Timestamp reset to", str(ts))
     lcd_timeout_test()
     led1.off()
@@ -332,10 +388,19 @@ lcd.lcd_clear()
 lcd.lcd_display_string("Power-On-", 1)
 lcd.lcd_display_string("Self-Test", 2)
 sleep(1)
+
+
+
+
+if len(sys.argv) >= 2:
+    n = int(sys.argv[1])
+else:
+    n = read_time_stamp()
+
 compressor.on()
-countdown(30)
+countdown(n)
 compressor.off()
-ts = ti()
+set_time_stamp()
 print("Timestamp reset to", str(ts))
 
 # Ensure crusher is retracted at start
@@ -377,7 +442,7 @@ try:
             countdown(want_pressure)
             runCycler()
             compressor.off()
-            ts = ti()
+            set_time_stamp()
             print("Timestamp reset to", str(ts))
             lcd_timeout_test()
 
