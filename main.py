@@ -138,7 +138,7 @@ def lcd_change_color(need):
 def lcd_timeout_test():
     global lcd_timeout
     lcd_timeout = lcd_timer()
-    if lcd_timeout():
+    if lcd_timeout:
         lcd_change_color(Green)
     else:
         lcd_change_color(Red)
