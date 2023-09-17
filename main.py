@@ -353,6 +353,7 @@ def read_time_stamp():
 			return pressure_time_ratio
 	else:
 		time_diff = 30
+		print("No time.ini file found. Sending default.")
 		print("time_diff default= ", str(time_diff))
 		return time_diff
 
