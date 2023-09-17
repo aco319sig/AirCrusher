@@ -399,7 +399,6 @@ compressor.on()
 countdown(n)
 compressor.off()
 set_time_stamp()
-print("Timestamp reset to", str(ts))
 
 # Ensure crusher is retracted at start
 crusher.off()
@@ -441,7 +440,6 @@ try:
 			runCycler()
 			compressor.off()
 			set_time_stamp()
-			print("Timestamp reset to", str(ts))
 			lcd_timeout_test()
 
 
