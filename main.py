@@ -303,6 +303,8 @@ def need_pressure():
 
 def set_time_stamp():
 	global ts
+	ts = ti()
+	new_ts = str(ts)
 	file_name = "./time.ini" #file to be searched
 	check_file = os.path.isfile(file_name)
 	if check_file:
@@ -311,15 +313,12 @@ def set_time_stamp():
 		time_group = config_obj["time_stamp"]
 		last_time = time_group["last_time"]
 		print('Previous time stamp: ' + str(last_time))
-		ts = ti()
-		config_obj.set('time_stamp', 'last_time', str(ts))
+		config_obj.set('time_stamp', 'last_time', new_ts)
 		configFile = open(file_name, 'w')
 		config_obj.write(configFile)
 		configFile.close()
-		print('New timestamp set: ' + str(ts))
+		print('New timestamp set: ' + new_ts)
 	else:
-		ts = ti()
-		new_ts = str(ts)
 		config_obj = configparser.ConfigParser()
 		config_obj.add_section("time_stamp")
 		config_obj.set("time_stamp", "last_time", new_ts)
