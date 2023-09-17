@@ -139,9 +139,9 @@ def lcd_timeout_test():
     global lcd_timeout
     lcd_timeout = lcd_timer()
     if lcd_timeout:
-        lcd_change_color(Green)
+        lcd_change_color('Green')
     else:
-        lcd_change_color(Red)
+        lcd_change_color('Red')
 
 def home():
     is_safe()
