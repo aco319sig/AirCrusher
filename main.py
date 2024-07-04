@@ -74,42 +74,38 @@ def switch_test():
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Start Pressed', 1)
 				print("Start Pressed")
-				sleep(0.01)
 			else:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Start released', 1)
 				print("Start released")
-				sleep(0.01)
+			sleep(1)
 			if reset_button.is_pressed:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Reset Pressed', 1)
 				print("Reset Pressed")
-				sleep(0.01)
 			else:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Reset released', 1)
 				print("Reset released")
-				sleep(0.01)
+			sleep(1)
 			if safe_switch.is_pressed:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Safe Pressed', 1)
 				print("Safe Pressed")
-				sleep(0.01)
 			else:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Safe released', 1)
 				print("Safe released")
-				sleep(0.01)
+			sleep(1)
 			if home_switch.is_pressed:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Home Pressed', 1)
 				print("Home Pressed")
-				sleep(0.01)
 			else:
 				# lcd.lcd_clear()
 				# lcd.lcd_display_string('Home released', 1)
 				print("Home released")
-				sleep(0.01)
+			sleep(1)
 	except KeyboardInterrupt:
 		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
 		print("Cleaning up!")
@@ -160,7 +156,7 @@ def lcd_timeout_test():
 def home():
 	is_safe()
 	global ts
-	looptime = ti()
+	# looptime = ti()
 	try:
 		led1.on()
 		if load_can():
@@ -354,7 +350,7 @@ def read_time_stamp():
 		print('Diff = ' + str(time_diff))
 		if time_diff >= 2400:
 			print("Time greater than 40 min")
-			return 30
+			return 20
 		elif time_diff <= 420:
 			print("Time less than 7 min")
 			return 5
@@ -364,7 +360,7 @@ def read_time_stamp():
 			pressure_time_ratio = round(time_diff / 80)
 			return pressure_time_ratio
 	else:
-		time_diff = 30
+		time_diff = 20
 		print("No time.ini file found. Sending default.")
 		print("time_diff default= ", str(time_diff))
 		return time_diff
@@ -395,7 +391,7 @@ def runCycler():
 # Safety check
 is_safe()
 print("Safety Check Done")
-# Acknowedge power on
+# Acknowledge power on
 # lcd.lcd_clear()
 # lcd.lcd_display_string("Power-On-", 1)
 # lcd.lcd_display_string("Self-Test", 2)
