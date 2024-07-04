@@ -65,56 +65,68 @@ compressor.off()
 
 ### Instantiate classes
 # Create display instance
-lcd = drivers.Lcd()
+# lcd = drivers.Lcd()
 
 def switch_test():
 	try:
 		while True:
 			if start_button.is_pressed:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Start Pressed', 1)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Start Pressed', 1)
+				print("Start Pressed")
+				sleep(0.01)
 			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Start released', 1)
-			sleep(2)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Start released', 1)
+				print("Start released")
+				sleep(0.01)
 			if reset_button.is_pressed:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Reset Pressed', 1)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Reset Pressed', 1)
+				print("Reset Pressed")
+				sleep(0.01)
 			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Reset released', 1)
-			sleep(2)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Reset released', 1)
+				print("Reset released")
+				sleep(0.01)
 			if safe_switch.is_pressed:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Safe Pressed', 1)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Safe Pressed', 1)
+				print("Safe Pressed")
+				sleep(0.01)
 			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Safe released', 1)
-			sleep(2)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Safe released', 1)
+				print("Safe released")
+				sleep(0.01)
 			if home_switch.is_pressed:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Home Pressed', 1)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Home Pressed', 1)
+				print("Home Pressed")
+				sleep(0.01)
 			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Home released', 1)
-			sleep(2)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Home released', 1)
+				print("Home released")
+				sleep(0.01)
 	except KeyboardInterrupt:
 		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
 		print("Cleaning up!")
-		display.lcd_clear()
-		lcd.lcd_display_string('Exiting debug', 1)
+		# display.lcd_clear()
+		# lcd.lcd_display_string('Exiting debug', 1)
 		sleep(3)
-		display.lcd_clear()
+		# display.lcd_clear()
 
 def is_safe():
 	if safe_switch.is_pressed:
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Rotator Jammed', 1)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string('Rotator Jammed', 1)
 		print("Rotator is Jammed!")
 		sys.exit()
 	else:
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Safe to Run', 1)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string('Safe to Run', 1)
 		print("Safe to run")
 		return True
 
@@ -131,9 +143,9 @@ def lcd_change_color(need):
 	if lcd_status == need:
 		pass
 	else:
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Loader ready', 1)
-		lcd.lcd_display_string(need + ' to start', 2)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string('Loader ready', 1)
+		# lcd.lcd_display_string(need + ' to start', 2)
 		lcd_status = need
 		print('lcd_status set to ' + need)
 
@@ -156,9 +168,9 @@ def home():
 			compressor.on()
 			countdown(need_pressure())
 			crush_it()
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Can Found', 1)
-			lcd.lcd_display_string('and Crushed!', 2)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Can Found', 1)
+			# lcd.lcd_display_string('and Crushed!', 2)
 			sleep(3)
 			compressor.off()
 			lcd_timeout_test()
@@ -172,8 +184,8 @@ def home():
 				return True
 			else:
 				print('Home function timed out')
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Timeout...', 1)
+				# lcd.lcd_clear()
+				# lcd.lcd_display_string('Timeout...', 1)
 				blink_error()
 				return False
 	except KeyboardInterrupt:
@@ -184,32 +196,32 @@ def home():
 def load_can():
 	if is_safe():
 		sleep(1)
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Safe passed', 1)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string('Safe passed', 1)
 	can_there = False
 	can_loaded = False
-	lcd.lcd_clear()
+	# lcd.lcd_clear()
 	delay = ti() + 3
 	while not home_switch.is_pressed:
 		loader.forward()
 		sleep(0.25)
 		if ti() > delay:
 			print('Loader Jammed!')
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Timeout reached!', 1)
-			lcd.lcd_display_string('Loader Jammed!', 2)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Timeout reached!', 1)
+			# lcd.lcd_display_string('Loader Jammed!', 2)
 			back_off()
 			return False
 		if can_there and not safe_switch.is_pressed:
 			can_loaded = True
 			print('Can Loaded')
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Can Loaded', 1)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Can Loaded', 1)
 		elif safe_switch.is_pressed:
 			can_there = True
 			print('Can Found')
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Can Found', 1)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Can Found', 1)
 		else:
 			print('Keep Moving')
 	unhome()
@@ -217,8 +229,8 @@ def load_can():
 	if can_there and not safe_switch.is_pressed:
 		can_loaded = True
 		print('Can Loaded')
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Can Loaded', 1)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string('Can Loaded', 1)
 	if can_there and can_loaded:
 		return True
 	else:
@@ -247,19 +259,19 @@ def b_inch(val=0.25):
 
 def crush_it():
 	print("Crushing")
-	lcd.lcd_clear()
-	lcd.lcd_display_string("Crushing!!", 1)
+	# lcd.lcd_clear()
+	# lcd.lcd_display_string("Crushing!!", 1)
 	compressor.off()
 	sleep(0.5)
 	crusher.on()
 	sleep(1)
 	# lcd.lcd_clear()
 	print("Retracting")
-	lcd.lcd_display_string("Retracting!!", 2)
+	# lcd.lcd_display_string("Retracting!!", 2)
 	crusher.off()
 	sleep(0.5)
-	lcd.lcd_clear()
-	lcd.lcd_display_string("Crush Complete", 1)
+	# lcd.lcd_clear()
+	# lcd.lcd_display_string("Crush Complete", 1)
 	compressor.on()
 	sleep(2)
 
@@ -276,12 +288,12 @@ def blink_error():
 def countdown(n):
 	while n>0:
 		print(str(n), 'seconds left')
-		lcd.lcd_clear()
+		# lcd.lcd_clear()
 		thisSecond = str(n)
-		lcd.lcd_display_string( 'Pressurizing....', 1)
+		# lcd.lcd_display_string( 'Pressurizing....', 1)
 		thisMessage = ''
 		thisMessage = str('Countdown = ' + str(n))
-		lcd.lcd_display_string(thisMessage, 2)
+		# lcd.lcd_display_string(thisMessage, 2)
 		n = n -1
 		sleep(0.8)
 
@@ -369,10 +381,10 @@ def runCycler():
 		crush_it()
 		sleep(5)
 	else:
-		lcd.lcd_clear()
-		lcd.lcd_display_string("No more cans!!", 1 )
-		lcd.lcd_display_string("Reset in 10 sec", 2)
-		sleep(10)
+		# lcd.lcd_clear()
+		# lcd.lcd_display_string("No more cans!!", 1 )
+		# lcd.lcd_display_string("Reset in 10 sec", 2)
+		sleep(5)
 		compressor.off()
 	set_time_stamp()
 	lcd_timeout_test()
@@ -384,9 +396,9 @@ def runCycler():
 is_safe()
 print("Safety Check Done")
 # Acknowedge power on
-lcd.lcd_clear()
-lcd.lcd_display_string("Power-On-", 1)
-lcd.lcd_display_string("Self-Test", 2)
+# lcd.lcd_clear()
+# lcd.lcd_display_string("Power-On-", 1)
+# lcd.lcd_display_string("Self-Test", 2)
 sleep(1)
 
 
@@ -406,11 +418,11 @@ set_time_stamp()
 crusher.off()
 
 # Home the rotor
-lcd.lcd_clear()
-lcd.lcd_display_string("Homing loader", 1)
-lcd.lcd_display_string("for first time", 2)
+# lcd.lcd_clear()
+# lcd.lcd_display_string("Homing loader", 1)
+# lcd.lcd_display_string("for first time", 2)
 sleep(2)
-lcd.lcd_clear()
+# lcd.lcd_clear()
 home()
 # Wait for Start Button
 try:
@@ -422,18 +434,22 @@ try:
 		r_second = reset_button.value
 		lcd_timeout_test()
 		if first and not second:
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Start pressed!', 1)
+			sleep(0.01)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Start pressed!', 1)
 		elif not first and second:
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Start released!', 1)
+			sleep(0.01)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Start released!', 1)
 			runCycler()
 		elif r_first and not r_second:
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Reset Pressed', 1)
+			sleep(0.01)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Reset Pressed', 1)
 		elif not r_first and r_second:
-			lcd.lcd_clear()
-			lcd.lcd_display_string('Reset released', 1)
+			sleep(0.01)
+			# lcd.lcd_clear()
+			# lcd.lcd_display_string('Reset released', 1)
 			compressor.on()
 			want_pressure = need_pressure()
 			if want_pressure < 15:
@@ -446,9 +462,9 @@ try:
 
 
 except KeyboardInterrupt:
-	lcd.lcd_clear()
-	lcd.lcd_display_string('Program Stop', 1)
-	lcd.lcd_display_string('by KBI',2)
+	# lcd.lcd_clear()
+	# lcd.lcd_display_string('Program Stop', 1)
+	# lcd.lcd_display_string('by KBI',2)
 	loader.stop()
 	crusher.off()
 	compressor.off()
