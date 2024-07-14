@@ -119,6 +119,7 @@ def is_safe():
 		return True
 
 def lcd_timer():
+	global ts
 	nts = ti()
 	time_diff = nts - ts
 	if time_diff >= 900:
@@ -128,14 +129,11 @@ def lcd_timer():
 
 def lcd_change_color(need):
 	global lcd_status
-	if lcd_status == need:
-		pass
-	else:
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Loader ready', 1)
-		lcd.lcd_display_string(need + ' to start', 2)
-		lcd_status = need
-		print('lcd_status set to ' + need)
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Loader ready', 1)
+	lcd.lcd_display_string(need + ' to start', 2)
+	lcd_status = need
+	print('lcd_status set to ' + need)
 
 def lcd_timeout_test():
 	global lcd_timeout
@@ -252,7 +250,7 @@ def crush_it():
 	compressor.off()
 	sleep(0.5)
 	crusher.on()
-	sleep(1)
+	sleep(1.5)
 	# lcd.lcd_clear()
 	print("Retracting")
 	lcd.lcd_display_string("Retracting!!", 2)
@@ -371,8 +369,8 @@ def runCycler():
 	else:
 		lcd.lcd_clear()
 		lcd.lcd_display_string("No more cans!!", 1 )
-		lcd.lcd_display_string("Reset in 10 sec", 2)
-		sleep(10)
+		lcd.lcd_display_string("Reset in 5 sec", 2)
+		sleep(5)
 		compressor.off()
 	set_time_stamp()
 	lcd_timeout_test()
@@ -446,7 +444,6 @@ try:
 			compressor.off()
 			set_time_stamp()
 			lcd_timeout_test()
-
 
 except KeyboardInterrupt:
 	lcd.lcd_clear()
