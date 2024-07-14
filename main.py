@@ -425,28 +425,28 @@ try:
 	while True:
 		first = start_button.value
 		r_first = reset_button.value
-		sleep(0.01)
+		sleep(0.03)
 		second = start_button.value
 		r_second = reset_button.value
 		lcd_timeout_test()
 		if first and not second:
-			sleep(0.01)
+			sleep(0.03)
 			print("Green pressed")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Start pressed!', 1)
 		elif not first and second:
-			sleep(0.01)
+			sleep(0.03)
 			print("Green released")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Start released!', 1)
 			runCycler()
 		elif r_first and not r_second:
-			sleep(0.01)
+			sleep(0.03)
 			print("Red pressed")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Reset Pressed', 1)
 		elif not r_first and r_second:
-			sleep(0.01)
+			sleep(0.03)
 			print("Red released")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Reset released', 1)
