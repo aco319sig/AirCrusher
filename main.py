@@ -376,7 +376,10 @@ def runCycler():
 		sleep(5)
 		compressor.off()
 		set_time_stamp()
-		lcd_change_color('Red')
+		need = 'Red'
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Loader ready', 1)
+		lcd.lcd_display_string(need + ' to start', 2)
 	led1.off()
 	led2.off()
 
