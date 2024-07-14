@@ -148,7 +148,7 @@ def lcd_timeout_test():
 def home():
 	is_safe()
 	global ts
-	looptime = ti()
+	# looptime = ti()
 	try:
 		led1.on()
 		if load_can():
@@ -428,6 +428,9 @@ try:
 			lcd.lcd_clear()
 			lcd.lcd_display_string('Start released!', 1)
 			runCycler()
+			compressor.off()
+			set_time_stamp()
+			lcd_timeout_test()
 		elif r_first and not r_second:
 			lcd.lcd_clear()
 			lcd.lcd_display_string('Reset Pressed', 1)
