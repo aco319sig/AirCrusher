@@ -14,7 +14,7 @@ TAILONZ PNEUMATIC Air Cylinder
 	Bore: 2 1/2 inch (63mm)
 	Stroke: 6 inch (150mm)
 	Piston type: Screwed Piston Rod
-	Dual Action (Air powered exttend and retract)
+	Dual Action (Air powered extend and retract)
 	(additional fittings will be needed to connect to valve, see next item:)
 Male Straight 3/8 Inch Tube OD x 3/8 Inch NPT Thread Push to Connect Fittings
 
