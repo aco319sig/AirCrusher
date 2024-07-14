@@ -431,23 +431,23 @@ try:
 		lcd_timeout_test()
 		if first and not second:
 			sleep(0.01)
-			print("Green pressed")
+			print("Red pressed")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Start pressed!', 1)
 		elif not first and second:
 			sleep(0.01)
-			print("Green released")
+			print("Red released")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Start released!', 1)
 			runCycler()
 		elif r_first and not r_second:
 			sleep(0.01)
-			print("Red pressed")
+			print("Green pressed")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Reset Pressed', 1)
 		elif not r_first and r_second:
 			sleep(0.01)
-			print("Red released")
+			print("Green released")
 			# lcd.lcd_clear()
 			# lcd.lcd_display_string('Reset released', 1)
 			compressor.on()
