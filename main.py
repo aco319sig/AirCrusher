@@ -129,11 +129,14 @@ def lcd_timer():
 
 def lcd_change_color(need):
 	global lcd_status
-	lcd.lcd_clear()
-	lcd.lcd_display_string('Loader ready', 1)
-	lcd.lcd_display_string(need + ' to start', 2)
-	lcd_status = need
-	print('lcd_status set to ' + need)
+	if lcd_status == need:
+		pass
+	else:
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Loader ready', 1)
+		lcd.lcd_display_string(need + ' to start', 2)
+		lcd_status = need
+		print('lcd_status set to ' + need)
 
 def lcd_timeout_test():
 	global lcd_timeout
@@ -146,7 +149,6 @@ def lcd_timeout_test():
 def home():
 	is_safe()
 	global ts
-	# looptime = ti()
 	try:
 		led1.on()
 		if load_can():
@@ -177,6 +179,7 @@ def home():
 	except KeyboardInterrupt:
 		print('Program terminated by KBI')
 		led1.off()
+		led2.off()
 		return False
 
 def load_can():
@@ -372,8 +375,8 @@ def runCycler():
 		lcd.lcd_display_string("Reset in 5 sec", 2)
 		sleep(5)
 		compressor.off()
-	set_time_stamp()
-	lcd_timeout_test()
+		set_time_stamp()
+		lcd_change_color('Red')
 	led1.off()
 	led2.off()
 
@@ -386,9 +389,6 @@ lcd.lcd_clear()
 lcd.lcd_display_string("Power-On-", 1)
 lcd.lcd_display_string("Self-Test", 2)
 sleep(1)
-
-
-
 
 if len(sys.argv) >= 2:
 	n = int(sys.argv[1])
@@ -428,7 +428,6 @@ try:
 			runCycler()
 			compressor.off()
 			set_time_stamp()
-			lcd_timeout_test()
 		elif r_first and not r_second:
 			lcd.lcd_clear()
 			lcd.lcd_display_string('Reset Pressed', 1)
@@ -443,7 +442,7 @@ try:
 			runCycler()
 			compressor.off()
 			set_time_stamp()
-			lcd_timeout_test()
+
 
 except KeyboardInterrupt:
 	lcd.lcd_clear()
