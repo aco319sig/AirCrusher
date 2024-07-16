@@ -52,8 +52,7 @@ ts = ti()
 nts = ''
 lcd_timeout = True
 lcd_status = 'Green'
-comp_status = False
-count_status = False
+all_stop = False
 
 # Non-Class devices
 led1 = LED(l1)
@@ -250,15 +249,21 @@ def crush_it():
 	lcd.lcd_display_string("Crushing!!", 1)
 	compressor.off()
 	sleep(0.5)
+	if all_stop:
+		return
 	crusher.on()
 	sleep(1.5)
 	# lcd.lcd_clear()
 	print("Retracting")
 	lcd.lcd_display_string("Retracting!!", 2)
+	if all_stop:
+		return
 	crusher.off()
 	sleep(0.5)
 	lcd.lcd_clear()
 	lcd.lcd_display_string("Crush Complete", 1)
+	if all_stop:
+		return
 	compressor.on()
 	sleep(2)
 
@@ -274,6 +279,8 @@ def blink_error():
 
 def countdown(n):
 	while n>0:
+		if all_stop:
+			break
 		print(str(n), 'seconds left')
 		lcd.lcd_clear()
 		lcd.lcd_display_string( 'Pressurizing....', 1)
@@ -358,12 +365,16 @@ def read_time_stamp():
 def runCycler():
 	global ts
 	# Add pressure check function here later
+	if all_stop:
+		return
 	compressor.on()
 	countdown(need_pressure())
 	crush_it()
 	led1.on()
 	led2.on()
 	while load_can():
+		if all_stop:
+			break
 		crush_it()
 		sleep(5)
 	else:
@@ -402,7 +413,10 @@ def compressor_cycle():
 	compressor_countdown(1800)
 
 def compressor_countdown(n):
+	global all_stop
 	while n>0:
+		if all_stop:
+			break
 		lcd.lcd_clear()
 		lcd.lcd_display_string( 'Compresser ON', 1)
 		if n<60:
@@ -428,6 +442,8 @@ def compressor_countdown(n):
 		sleep(5)
 
 def e_stop():
+	global all_stop
+	all_stop = True
 	lcd.lcd_clear()
 	lcd.lcd_display_string('Emer Stop', 1)
 	lcd.lcd_display_string('Pressed',2)
