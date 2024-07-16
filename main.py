@@ -78,10 +78,10 @@ def switch_test():
 		while True:
 			if start_button.is_pressed:
 				lcd.lcd_clear()
-				lcd.lcd_display_string('Green Pressed', 1)
+				lcd.lcd_display_string('Red Pressed', 1)
 			elif reset_button.is_pressed:
 				lcd.lcd_clear()
-				lcd.lcd_display_string('Red Pressed', 1)
+				lcd.lcd_display_string('Green Pressed', 1)
 			elif safe_switch.is_pressed:
 				lcd.lcd_clear()
 				lcd.lcd_display_string('Safe Pressed', 1)
@@ -446,7 +446,7 @@ def e_stop():
 	all_stop = True
 	lcd.lcd_clear()
 	lcd.lcd_display_string('Emer Stop', 1)
-	lcd.lcd_display_string('Pressed',2)
+	lcd.lcd_display_string('Green to cont.',2)
 	set_time_stamp()
 	loader.stop()
 	crusher.off()
@@ -455,7 +455,7 @@ def e_stop():
 	led1.off()
 	led2.off()
 	print("Emergency Stop Pressed!")
-	sys.exit()
+	reset_button.wait_for_press()
 
 ## Beginning of commands ##
 # Safety check
