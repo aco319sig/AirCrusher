@@ -441,12 +441,16 @@ def compressor_countdown(n):
 		lcd.lcd_display_string( 'Stopped', 2)
 		sleep(5)
 
+def reset_pi():
+	sys.exit()
+
 def e_stop():
 	global all_stop
 	all_stop = True
 	lcd.lcd_clear()
 	lcd.lcd_display_string('Emer Stop', 1)
-	lcd.lcd_display_string('Green to cont.',2)
+	lcd.lcd_display_string('Pressed',2)
+	sleep(5)
 	set_time_stamp()
 	loader.stop()
 	crusher.off()
@@ -454,8 +458,12 @@ def e_stop():
 	blink_error()
 	led1.off()
 	led2.off()
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Press Green', 1)
+	lcd.lcd_display_string('To Cont.',2)
 	print("Emergency Stop Pressed!")
-	reset_button.wait_for_press()
+	reset_button.when_released = reset_pi
+	
 
 ## Beginning of commands ##
 # Safety check
