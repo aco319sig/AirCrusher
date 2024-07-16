@@ -442,20 +442,23 @@ def compressor_countdown(n):
 		sleep(5)
 
 def reset_pi():
+	lcd.lcd_clear()
+	lcd.lcd_display_string('RESETTING...', 1)
+	blink()
 	sys.exit()
 
 def e_stop():
 	global all_stop
 	all_stop = True
+	sleep(3)
 	lcd.lcd_clear()
 	lcd.lcd_display_string('Emer Stop', 1)
 	lcd.lcd_display_string('Pressed',2)
-	sleep(5)
+	sleep(2)
 	set_time_stamp()
 	loader.stop()
 	crusher.off()
 	compressor.off()
-	blink_error()
 	led1.off()
 	led2.off()
 	lcd.lcd_clear()
