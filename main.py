@@ -99,10 +99,10 @@ def switch_test():
 	except KeyboardInterrupt:
 		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
 		print("Cleaning up!")
-		display.lcd_clear() # type: ignore
+		lcd.lcd_clear()
 		lcd.lcd_display_string('Exiting debug', 1)
 		sleep(3)
-		display.lcd_clear() # type: ignore
+		lcd.lcd_clear()
 
 def is_safe():
 	if safe_switch.is_pressed:
