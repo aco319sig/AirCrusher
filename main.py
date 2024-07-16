@@ -412,8 +412,16 @@ def compressor_cycle():
 
 
 def compressor_countdown(n):
-	try:
-		while n>0 or not stop_button.value:
+	while n>0:
+		if comp_button.value:
+			compressor.off()
+			print("Compressor stopped")
+			lcd.lcd_clear()
+			lcd.lcd_display_string( 'Compresser', 1)
+			lcd.lcd_display_string( 'Stopped', 2)
+			sleep(5)
+			break
+		else:
 			lcd.lcd_clear()
 			lcd.lcd_display_string( 'Compresser ON', 1)
 			if n<60:
@@ -430,23 +438,13 @@ def compressor_countdown(n):
 				lcd.lcd_display_string(thisMessage, 2)
 			n = n -1
 			sleep(0.8)
-		else:
-			compressor.off()
-			print("Compressor stopped")
-			lcd.lcd_clear()
-			lcd.lcd_display_string( 'Compresser', 1)
-			lcd.lcd_display_string( 'Stopped', 2)
-			sleep(5)
-	except KeyboardInterrupt:
-		lcd.lcd_clear()
-		lcd.lcd_display_string('Program Stop', 1)
-		lcd.lcd_display_string('by KBI',2)
-		loader.stop()
-		crusher.off()
+	else:
 		compressor.off()
-		blink_error()
-		led1.off()
-		led2.off()
+		print("Compressor stopped")
+		lcd.lcd_clear()
+		lcd.lcd_display_string( 'Compresser', 1)
+		lcd.lcd_display_string( 'Stopped', 2)
+		sleep(5)
 
 ## Beginning of commands ##
 # Safety check
