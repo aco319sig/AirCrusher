@@ -79,32 +79,23 @@ def switch_test():
 		while True:
 			if start_button.is_pressed:
 				lcd.lcd_clear()
-				lcd.lcd_display_string('Start Pressed', 1)
-			else:
+				lcd.lcd_display_string('Green Pressed', 1)
+			elif reset_button.is_pressed:
 				lcd.lcd_clear()
-				lcd.lcd_display_string('Start released', 1)
-			sleep(2)
-			if reset_button.is_pressed:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Reset Pressed', 1)
-			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Reset released', 1)
-			sleep(2)
-			if safe_switch.is_pressed:
+				lcd.lcd_display_string('Red Pressed', 1)
+			elif safe_switch.is_pressed:
 				lcd.lcd_clear()
 				lcd.lcd_display_string('Safe Pressed', 1)
-			else:
-				lcd.lcd_clear()
-				lcd.lcd_display_string('Safe released', 1)
-			sleep(2)
-			if home_switch.is_pressed:
+			elif home_switch.is_pressed:
 				lcd.lcd_clear()
 				lcd.lcd_display_string('Home Pressed', 1)
-			else:
+			elif comp_button.is_pressed:
 				lcd.lcd_clear()
-				lcd.lcd_display_string('Home released', 1)
-			sleep(2)
+				lcd.lcd_display_string('Compressor Pressed', 1)
+			elif stop_button.is_pressed:
+				lcd.lcd_clear()
+				lcd.lcd_display_string('Stop Pressed', 1)
+			sleep(1)
 	except KeyboardInterrupt:
 		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
 		print("Cleaning up!")
@@ -410,34 +401,35 @@ def compressor_cycle():
 	compressor.on()
 	compressor_countdown(1800)
 
+def e_stop():
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Emer Stop', 1)
+	lcd.lcd_display_string('Pressed',2)
+	loader.stop()
+	crusher.off()
+	compressor.off()
+	blink_error()
+	led1.off()
+	led2.off()
 
 def compressor_countdown(n):
 	while n>0:
-		if comp_button.value:
-			compressor.off()
-			print("Compressor stopped")
-			lcd.lcd_clear()
-			lcd.lcd_display_string( 'Compresser', 1)
-			lcd.lcd_display_string( 'Stopped', 2)
-			sleep(5)
-			break
+		lcd.lcd_clear()
+		lcd.lcd_display_string( 'Compresser ON', 1)
+		if n<60:
+			print(str(n), 'Seconds left')
+			time_left = str(n)
+			thisMessage = ''
+			thisMessage = str('Seconds = ' + time_left)
+			lcd.lcd_display_string(thisMessage, 2)
 		else:
-			lcd.lcd_clear()
-			lcd.lcd_display_string( 'Compresser ON', 1)
-			if n<60:
-				print(str(n), 'Seconds left')
-				time_left = str(n)
-				thisMessage = ''
-				thisMessage = str('Seconds = ' + time_left)
-				lcd.lcd_display_string(thisMessage, 2)
-			else:
-				time_left = str(int(n / 60))
-				print(str(time_left), 'minutes left')
-				thisMessage = ''
-				thisMessage = str('Minutes = ' + time_left)
-				lcd.lcd_display_string(thisMessage, 2)
-			n = n -1
-			sleep(0.8)
+			time_left = str(int(n / 60))
+			print(str(time_left), 'minutes left')
+			thisMessage = ''
+			thisMessage = str('Minutes = ' + time_left)
+			lcd.lcd_display_string(thisMessage, 2)
+		n = n -1
+		sleep(0.8)
 	else:
 		compressor.off()
 		print("Compressor stopped")
@@ -448,6 +440,7 @@ def compressor_countdown(n):
 
 ## Beginning of commands ##
 # Safety check
+stop_button.when_pressed = e_stop()
 if is_safe():
 	print("Safety Check Done")
 	sleep(1)
