@@ -401,19 +401,6 @@ def compressor_cycle():
 	compressor.on()
 	compressor_countdown(1800)
 
-def e_stop():
-	lcd.lcd_clear()
-	lcd.lcd_display_string('Emer Stop', 1)
-	lcd.lcd_display_string('Pressed',2)
-	set_time_stamp()
-	loader.stop()
-	crusher.off()
-	compressor.off()
-	blink_error()
-	led1.off()
-	led2.off()
-	print("Emergency Stop Pressed!")
-
 def compressor_countdown(n):
 	while n>0:
 		lcd.lcd_clear()
@@ -439,6 +426,20 @@ def compressor_countdown(n):
 		lcd.lcd_display_string( 'Compresser', 1)
 		lcd.lcd_display_string( 'Stopped', 2)
 		sleep(5)
+
+def e_stop():
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Emer Stop', 1)
+	lcd.lcd_display_string('Pressed',2)
+	set_time_stamp()
+	loader.stop()
+	crusher.off()
+	compressor.off()
+	blink_error()
+	led1.off()
+	led2.off()
+	print("Emergency Stop Pressed!")
+	sys.exit()
 
 ## Beginning of commands ##
 # Safety check
