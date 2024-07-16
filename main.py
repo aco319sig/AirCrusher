@@ -405,12 +405,14 @@ def e_stop():
 	lcd.lcd_clear()
 	lcd.lcd_display_string('Emer Stop', 1)
 	lcd.lcd_display_string('Pressed',2)
+	set_time_stamp()
 	loader.stop()
 	crusher.off()
 	compressor.off()
 	blink_error()
 	led1.off()
 	led2.off()
+	print("Emergency Stop Pressed!")
 
 def compressor_countdown(n):
 	while n>0:
@@ -440,7 +442,7 @@ def compressor_countdown(n):
 
 ## Beginning of commands ##
 # Safety check
-stop_button.when_pressed = e_stop()
+stop_button.when_pressed = e_stop
 if is_safe():
 	print("Safety Check Done")
 	sleep(1)
