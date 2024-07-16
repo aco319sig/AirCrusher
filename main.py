@@ -28,9 +28,10 @@ break-beam sensors to detect both positioning and payload.
 import sys, drivers, threading, configparser
 from time import sleep
 from time import time as ti
-from gpiozero import Button, LED, Motor, DigitalOutputDevice
+from gpiozero import Button, LED, Motor, DigitalOutputDevice # type: ignore
 import os.path
 import os
+import socket
 
 sleep(1.5)
 home_pin = 25
@@ -38,6 +39,8 @@ start_pin = 20
 reset_pin = 16
 load_pin = 8
 retract_pin = 7
+comp_pin = 9
+stop_pin = 10
 l1 = 17
 l2 = 21
 disp_sda = 2
@@ -49,6 +52,8 @@ ts = ti()
 nts = ''
 lcd_timeout = True
 lcd_status = 'Green'
+comp_status = False
+count_status = False
 
 # Non-Class devices
 led1 = LED(l1)
@@ -57,6 +62,8 @@ home_switch = Button(home_pin, pull_up=True)
 safe_switch = Button(case_safety, pull_up=True)
 start_button = Button(start_pin, pull_up=True)
 reset_button = Button(reset_pin, pull_up=True)
+comp_button = Button(comp_pin, pull_up=True)
+stop_button = Button(stop_pin, pull_up=True)
 loader = Motor(load_pin, retract_pin)
 crusher = DigitalOutputDevice(crushPin, active_high=False, initial_value=False)
 crusher.off()
@@ -101,10 +108,10 @@ def switch_test():
 	except KeyboardInterrupt:
 		# If there is a KeyboardInterrupt (when you press ctrl+c), exit the program and cleanup
 		print("Cleaning up!")
-		display.lcd_clear()
+		display.lcd_clear() # type: ignore
 		lcd.lcd_display_string('Exiting debug', 1)
 		sleep(3)
-		display.lcd_clear()
+		display.lcd_clear() # type: ignore
 
 def is_safe():
 	if safe_switch.is_pressed:
@@ -278,7 +285,6 @@ def countdown(n):
 	while n>0:
 		print(str(n), 'seconds left')
 		lcd.lcd_clear()
-		thisSecond = str(n)
 		lcd.lcd_display_string( 'Pressurizing....', 1)
 		thisMessage = ''
 		thisMessage = str('Countdown = ' + str(n))
@@ -383,15 +389,87 @@ def runCycler():
 	led1.off()
 	led2.off()
 
+def get_ip():
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.settimeout(0)
+	try:
+		# doesn't even have to be reachable
+		s.connect(('10.254.254.254', 1))
+		IP = s.getsockname()[0]
+	except Exception:
+		IP = '127.0.0.1'
+	finally:
+		s.close()
+	return IP
+
+def compressor_cycle():
+	lcd.lcd_clear()
+	lcd.lcd_display_string("Comp ON", 1)
+	lcd.lcd_display_string("For 30 Min", 2)
+	sleep(2)
+	compressor.on()
+	compressor_countdown(1800)
+
+
+def compressor_countdown(n):
+	try:
+		while n>0 or not stop_button.value:
+			lcd.lcd_clear()
+			lcd.lcd_display_string( 'Compresser ON', 1)
+			if n<60:
+				print(str(n), 'Seconds left')
+				time_left = str(n)
+				thisMessage = ''
+				thisMessage = str('Seconds = ' + time_left)
+				lcd.lcd_display_string(thisMessage, 2)
+			else:
+				time_left = str(int(n / 60))
+				print(str(time_left), 'minutes left')
+				thisMessage = ''
+				thisMessage = str('Minutes = ' + time_left)
+				lcd.lcd_display_string(thisMessage, 2)
+			n = n -1
+			sleep(0.8)
+		else:
+			compressor.off()
+			print("Compressor stopped")
+			lcd.lcd_clear()
+			lcd.lcd_display_string( 'Compresser', 1)
+			lcd.lcd_display_string( 'Stopped', 2)
+			sleep(5)
+	except KeyboardInterrupt:
+		lcd.lcd_clear()
+		lcd.lcd_display_string('Program Stop', 1)
+		lcd.lcd_display_string('by KBI',2)
+		loader.stop()
+		crusher.off()
+		compressor.off()
+		blink_error()
+		led1.off()
+		led2.off()
+
 ## Beginning of commands ##
 # Safety check
-is_safe()
-print("Safety Check Done")
+if is_safe():
+	print("Safety Check Done")
+	sleep(1)
+else:
+	lcd.lcd_clear()
+	lcd.lcd_display_string('Loader Jammed', 1)
+	loader.stop()
+	crusher.off()
+	compressor.off()
+	blink_error()
+	led1.off()
+	led2.off()
+	sleep(5)
+
 # Acknowedge power on
+host_ip = get_ip()
 lcd.lcd_clear()
-lcd.lcd_display_string("Power-On-", 1)
-lcd.lcd_display_string("Self-Test", 2)
-sleep(1)
+lcd.lcd_display_string("POST IP=", 1)
+lcd.lcd_display_string(host_ip, 2)
+sleep(5)
 
 if len(sys.argv) >= 2:
 	n = int(sys.argv[1])
@@ -418,9 +496,11 @@ try:
 	while True:
 		first = start_button.value
 		r_first = reset_button.value
+		c_first = comp_button.value
 		sleep(0.01)
 		second = start_button.value
 		r_second = reset_button.value
+		c_second = comp_button.value
 		lcd_timeout_test()
 		if first and not second:
 			lcd.lcd_clear()
@@ -445,7 +525,15 @@ try:
 			runCycler()
 			compressor.off()
 			set_time_stamp()
-
+		elif c_first and not c_second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('COMP Pressed', 1)
+		elif not c_first and c_second:
+			lcd.lcd_clear()
+			lcd.lcd_display_string('COMP released', 1)
+			compressor_cycle()
+			set_time_stamp()
+			lcd_timeout_test()
 
 except KeyboardInterrupt:
 	lcd.lcd_clear()
