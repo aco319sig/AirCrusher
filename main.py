@@ -262,7 +262,7 @@ def crush_it():
 	lcd.lcd_clear()
 	lcd.lcd_display_string("Crush Complete", 1)
 	compressor.on()
-	sleep(2)
+	sleep(1)
 
 def blink():
 	print("blink")
@@ -289,16 +289,16 @@ def countdown(n):
 def need_pressure():
 	nts = ti()
 	time_diff = nts - ts
-	if time_diff >= 2400:
-		print("Time greater than 40 min")
-		return 17
+	if time_diff >= 5400:
+		print("Time greater than 90 min")
+		return 15
 	elif time_diff <= 420:
 		print("Time less than 7 min")
-		return 5
+		return 2
 	else:
 		print("time_diff = ", str(time_diff))
 		print("Calculating required time...")
-		pressure_time_ratio = round(time_diff / 140)
+		pressure_time_ratio = round(time_diff / 360)
 		return pressure_time_ratio
 
 
@@ -368,12 +368,12 @@ def runCycler():
 	led2.on()
 	while load_can():
 		crush_it()
-		sleep(5)
+		sleep(3)
 	else:
 		lcd.lcd_clear()
 		lcd.lcd_display_string("No more cans!!", 1 )
 		lcd.lcd_display_string("Reset in 5 sec", 2)
-		sleep(5)
+		sleep(3)
 		compressor.off()
 		set_time_stamp()
 		need = 'Red'
