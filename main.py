@@ -119,7 +119,7 @@ def lcd_timer():
 	global ts
 	nts = ti()
 	time_diff = nts - ts
-	if time_diff >= 900:
+	if time_diff >= 10800:
 		return True
 	else:
 		return False
@@ -406,7 +406,7 @@ def get_ip():
 
 def compressor_cycle():
 	lcd.lcd_clear()
-	lcd.lcd_display_string("Comp ON", 1)
+	lcd.lcd_display_string("Compressor ON", 1)
 	lcd.lcd_display_string("For 30 Min", 2)
 	sleep(2)
 	compressor.on()
@@ -418,7 +418,7 @@ def compressor_countdown(n):
 		if all_stop:
 			break
 		lcd.lcd_clear()
-		lcd.lcd_display_string( 'Compresser ON', 1)
+		lcd.lcd_display_string( 'Compressor ON', 1)
 		if n<60:
 			print(str(n), 'Seconds left')
 			time_left = str(n)
@@ -437,7 +437,7 @@ def compressor_countdown(n):
 		compressor.off()
 		print("Compressor stopped")
 		lcd.lcd_clear()
-		lcd.lcd_display_string( 'Compresser', 1)
+		lcd.lcd_display_string( 'Compressor', 1)
 		lcd.lcd_display_string( 'Stopped', 2)
 		sleep(5)
 
