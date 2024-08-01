@@ -347,10 +347,10 @@ def read_time_stamp():
 		print('Diff = ' + str(time_diff))
 		if time_diff >= 10800:
 			print("Time greater than 3 hours")
-			return 30
+			return 15
 		elif time_diff <= 720:
 			print("Time less than 12 min")
-			return 5
+			return 1
 		else:
 			print("time_diff = ", str(time_diff))
 			print("Calculating required time... 1 sec per 12 min")
@@ -380,7 +380,7 @@ def runCycler():
 	else:
 		lcd.lcd_clear()
 		lcd.lcd_display_string("No more cans!!", 1 )
-		lcd.lcd_display_string("Reset in 5 sec", 2)
+		lcd.lcd_display_string("Reset in 3 sec", 2)
 		sleep(3)
 		compressor.off()
 		set_time_stamp()
