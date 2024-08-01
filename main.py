@@ -293,16 +293,16 @@ def countdown(n):
 def need_pressure():
 	nts = ti()
 	time_diff = nts - ts
-	if time_diff >= 5400:
-		print("Time greater than 90 min")
+	if time_diff >= 10800:
+		print("Time greater than 3 hours")
 		return 15
-	elif time_diff <= 420:
-		print("Time less than 7 min")
-		return 2
+	elif time_diff <= 720:
+		print("Time less than 12 min")
+		return 1
 	else:
 		print("time_diff = ", str(time_diff))
-		print("Calculating required time...")
-		pressure_time_ratio = round(time_diff / 360)
+		print("Calculating required time... 1 sec per 12 min")
+		pressure_time_ratio = round(time_diff / 720)
 		return pressure_time_ratio
 
 
@@ -345,16 +345,16 @@ def read_time_stamp():
 		time_diff = time_now - last_time
 		print('Recorded Time Stamp from file: ' + str(last_time))
 		print('Diff = ' + str(time_diff))
-		if time_diff >= 2400:
-			print("Time greater than 40 min")
+		if time_diff >= 10800:
+			print("Time greater than 3 hours")
 			return 30
-		elif time_diff <= 420:
-			print("Time less than 7 min")
+		elif time_diff <= 720:
+			print("Time less than 12 min")
 			return 5
 		else:
 			print("time_diff = ", str(time_diff))
-			print("Calculating required time...")
-			pressure_time_ratio = round(time_diff / 80)
+			print("Calculating required time... 1 sec per 12 min")
+			pressure_time_ratio = round(time_diff / 720)
 			return pressure_time_ratio
 	else:
 		time_diff = 30
@@ -452,7 +452,7 @@ def e_stop():
 	all_stop = True
 	sleep(3)
 	lcd.lcd_clear()
-	lcd.lcd_display_string('Emer Stop', 1)
+	lcd.lcd_display_string('Emergency Stop', 1)
 	lcd.lcd_display_string('Pressed',2)
 	sleep(2)
 	set_time_stamp()
@@ -485,7 +485,7 @@ else:
 	led2.off()
 	sleep(5)
 
-# Acknowedge power on
+# Acknowledge power on
 host_ip = get_ip()
 lcd.lcd_clear()
 lcd.lcd_display_string("POST IP=", 1)
