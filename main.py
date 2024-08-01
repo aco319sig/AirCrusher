@@ -380,8 +380,8 @@ def runCycler():
 	else:
 		lcd.lcd_clear()
 		lcd.lcd_display_string("No more cans!!", 1 )
-		lcd.lcd_display_string("Reset in 3 sec", 2)
-		sleep(3)
+		lcd.lcd_display_string("Reset in 2 sec", 2)
+		sleep(2)
 		compressor.off()
 		set_time_stamp()
 		need = 'Red'
