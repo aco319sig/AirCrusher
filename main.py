@@ -538,11 +538,11 @@ try:
 		elif not r_first and r_second:
 			lcd.lcd_clear()
 			lcd.lcd_display_string('Reset released', 1)
-			compressor.on()
-			want_pressure = need_pressure()
-			if want_pressure < 15:
-				want_pressure = 15
-			countdown(want_pressure)
+			# compressor.on()
+			# want_pressure = need_pressure()
+			# if want_pressure < 15:
+			# 	want_pressure = 15
+			# countdown(want_pressure)
 			runCycler()
 			compressor.off()
 			set_time_stamp()
