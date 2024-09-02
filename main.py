@@ -32,6 +32,7 @@ from gpiozero import Button, LED, Motor, DigitalOutputDevice # type: ignore
 import os.path
 import os
 import socket
+from pydbus import SystemBus
 
 sleep(1.5)
 home_pin = 25
@@ -444,7 +445,11 @@ def compressor_countdown(n):
 def reset_pi():
 	lcd.lcd_clear()
 	lcd.lcd_display_string('RESETTING...', 1)
+	bus = SystemBus()
 	blink()
+	systemd = bus.get(".systemd1")
+	systemd.RestartUnit("crusher.service", "fail")
+	print("reset command sent")
 	sys.exit()
 
 def e_stop():
