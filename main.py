@@ -28,7 +28,7 @@ break-beam sensors to detect both positioning and payload.
 import sys, drivers, threading, configparser
 from time import sleep
 from time import time as ti
-from gpiozero import Button, LED, Motor, DigitalOutputDevice # type: ignore
+from gpiozero import Button, LED, Motor, DigitalOutputDevice
 import os.path
 import os
 import socket
